@@ -8,9 +8,21 @@
 //   npm run seed       → fills a demo college with a month of history
 //   npm run smoke      → walks one report through every service, no HTTP
 
+import { spawn } from "node:child_process";
 import { boot } from "./src/services/index.js";
 import { createApp } from "./src/http/app.js";
 import { config } from "./src/config.js";
+
+// Demo bootstrap: with TRUSTLINE_SEED_ON_BOOT=1 the data directory is rebuilt
+// from the Kerala demo fixtures before the app starts. This is for staging and
+// shareable demos — leave it off for a deployment that is expected to keep data.
+if (process.env.TRUSTLINE_SEED_ON_BOOT === "1") {
+  console.log("[seed-on-boot] rebuilding the demo data directory…");
+  await new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ["scripts/seed.js"], { stdio: "inherit" });
+    child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`seed on boot failed (exit ${code})`))));
+  });
+}
 
 const { container, owner } = await boot();
 const app = createApp({ container });
