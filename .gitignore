@@ -1,0 +1,12 @@
+node_modules/
+
+# The JSON store is runtime state, not source. `npm run seed` rebuilds it.
+data/*.json
+data/*.json.bak
+data/*.corrupt-*
+data/evidence/
+!data/.gitkeep
+
+.DS_Store
+*.log
+.env

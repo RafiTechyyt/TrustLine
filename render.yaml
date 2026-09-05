@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: trustline
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: TRUSTLINE_SECRET
+        generateValue: true
+      - key: TRUSTLINE_OWNER_EMAIL
+        value: owner@trustline.app
+      - key: TRUSTLINE_OWNER_PASSWORD
+        value: trustline-owner

@@ -1,0 +1,1440 @@
+/* fx.css — TrustLine: the deep-space command console, v3.
+ *
+ * Loaded only from index.html, after base.css. base.css is the behavioural
+ * scaffold (selectors, forms, hooks, routing) and OPS.css owns the staff side.
+ * This file REPLACES the whole public visual design — the compositions, not just
+ * the colours: a centred cinematic hero stage with orbit rings, a telemetry
+ * deck where the register used to sit, sectors framed like flight plan legs,
+ * feeds that read as ops cards on a glass grid, a mission-map for "how it
+ * works", and a ground-control footer.
+ *
+ * Safety rails (unchanged):
+ *  - Everything is wrapped in @media screen: base.css print rules still print a
+ *    clean white report.
+ *  - Colours come from the SAME variables base.css defines, remapped here, so
+ *    the staff console (base.css + ops.css) is untouched.
+ *  - Motion is gated behind body.fx-active (added by fx.js) AND
+ *    prefers-reduced-motion. Reduced-motion users get the dark theme and a
+ *    static sky, never animation.
+ */
+
+@media screen {
+
+  /* =========================================================================
+     THEME — deep space. "Paper" is night sky, "ink" is cold light.
+     ========================================================================= */
+
+  :root {
+    color-scheme: dark;
+
+    --paper:      #05080f;
+    --paper-2:    #0a101d;
+    --paper-3:    #0f1728;
+    --card:       #0c1322;
+
+    --ink:        #e2ecff;
+    --ink-2:      #97a8cb;
+    --ink-3:      #62749b;
+
+    /* The two marks of authority become neon: warning rose and command cyan. */
+    --seal:       #ff3b6b;
+    --seal-deep:  #ff1f55;
+    --seal-wash:  #2b0f22;
+    --indigo:     #22d3ee;
+    --indigo-2:   #60a5fa;
+    --indigo-wash:#08263f;
+
+    --green:      #34e0b3;
+    --green-wash: #07241f;
+    --amber:      #ffb84d;
+    --amber-wash: #29190a;
+
+    --rule:       color-mix(in srgb, var(--ink) 13%, transparent);
+    --rule-firm:  color-mix(in srgb, var(--ink) 32%, transparent);
+    --rule-faint: color-mix(in srgb, var(--ink) 8%, transparent);
+
+    --glass:      color-mix(in srgb, var(--card) 82%, transparent);
+    --glass-2:    color-mix(in srgb, var(--card) 55%, transparent);
+    --edge:       color-mix(in srgb, var(--indigo) 30%, transparent);
+  }
+
+  /* The scene. */
+  body {
+    font-family: var(--ui);
+    background:
+      radial-gradient(1300px 900px at 82% -12%, rgba(124, 58, 237, 0.20), transparent 62%),
+      radial-gradient(1200px 820px at -14% 22%, rgba(34, 211, 238, 0.13), transparent 58%),
+      radial-gradient(1100px 900px at 58% 118%, rgba(255, 59, 107, 0.10), transparent 60%),
+      var(--paper);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  body.fx-active::before {
+    opacity: 0.34;
+    mix-blend-mode: soft-light;
+  }
+
+  /* CSS-only sky: static stardust plus a vignette, so the page has depth before
+     any JavaScript paints a single frame. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 12% 28%, rgba(214, 228, 255, 0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 31% 12%, rgba(214, 228, 255, 0.36) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 46% 33%, rgba(34, 211, 238, 0.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 63% 17%, rgba(255, 59, 107, 0.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 78% 31%, rgba(214, 228, 255, 0.45) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 89% 14%, rgba(96, 165, 250, 0.45) 50%, transparent 51%),
+      radial-gradient(1px 1px at 8% 52%, rgba(214, 228, 255, 0.32) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 24% 61%, rgba(34, 211, 238, 0.36) 50%, transparent 51%),
+      radial-gradient(1px 1px at 41% 47%, rgba(214, 228, 255, 0.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 57% 57%, rgba(255, 59, 107, 0.36) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 71% 44%, rgba(192, 132, 252, 0.44) 50%, transparent 51%),
+      radial-gradient(1px 1px at 86% 55%, rgba(214, 228, 255, 0.32) 50%, transparent 51%),
+      radial-gradient(1px 1px at 95% 41%, rgba(214, 228, 255, 0.36) 50%, transparent 51%),
+      radial-gradient(1400px 600px at 50% 112%, rgba(34, 211, 238, 0.10), transparent 65%),
+      radial-gradient(100% 100% at 50% 50%, transparent 60%, rgba(0, 0, 5, 0.6) 100%);
+    background-size: 240px 240px, 280px 280px, 310px 310px, 260px 260px, 300px 300px,
+      250px 250px, 330px 330px, 290px 290px, 270px 270px, 250px 250px,
+      320px 320px, 280px 280px, 340px 340px, 100% 100%, 100% 100%;
+    background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat,
+      repeat, repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat;
+  }
+
+  ::selection { background: var(--seal); color: #070a12; }
+
+  a { color: var(--indigo); text-shadow: 0 0 14px rgba(34, 211, 238, 0.25); }
+  a:hover { color: var(--seal); text-shadow: 0 0 16px rgba(255, 59, 107, 0.5); }
+
+  /* =========================================================================
+     LAYER STACK
+     canvas (z 0) → scanlines (z 20) → viewport frame (z 35) → masthead (z 40)
+     → top beam (z 45) → HUD (z 55) → sheets/modals/toasts (base 60/70/80)
+     ========================================================================= */
+
+  .fx-space {
+    position: fixed !important;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0 !important;
+    pointer-events: none;
+    display: block;
+    max-width: none !important;
+  }
+
+  .fx-scan {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px 3px
+    );
+  }
+
+  .fx-frame {
+    position: fixed;
+    inset: 10px;
+    z-index: 35;
+    pointer-events: none;
+  }
+  .fx-frame i {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 0 solid color-mix(in srgb, var(--indigo) 38%, transparent);
+  }
+  .fx-frame i:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+  .fx-frame i:nth-child(2) { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+  .fx-frame i:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+  .fx-frame i:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+  .fx-beam {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 45;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent, var(--indigo) 30%, var(--seal) 55%, var(--indigo-2) 78%, transparent);
+    background-size: 260% 100%;
+  }
+
+  /* =========================================================================
+     TYPOGRAPHY
+     ========================================================================= */
+
+  body.fx-active h1, body.fx-active h2 {
+    font-size-adjust: none;
+  }
+
+  body.fx-active h2, body.fx-active h3 {
+    letter-spacing: 0.005em;
+  }
+  body.fx-active h2.t-md, body.fx-active h3.entry-title {
+    color: var(--ink);
+    font-weight: 650;
+    font-stretch: 82%;
+  }
+
+  body.fx-active .measure, body.fx-active p { color: var(--ink-2); }
+  body.fx-active .quiet { color: var(--ink-2); }
+  body.fx-active .faint { color: var(--ink-3); }
+
+  body.fx-active .mono, body.fx-active .code { font-family: var(--code); }
+
+  /* Headlines step up to the display family; entry titles and section heads keep
+     the slightly condensed, tightly-set grotesque look. */
+  body.fx-active h1, body.fx-active h2, body.fx-active h3 { font-family: var(--display); }
+
+  /* A person's words keep the book face; everything around them is instrument.
+     Mirrors the staff console (see ops.css) so both surfaces read the same way. */
+  body.fx-active .entry-body, body.fx-active .msg-text, body.fx-active .prose {
+    font-family: var(--text);
+  }
+
+  /* Big numbers read like telemetry. */
+  body.fx-active .count-n {
+    font-family: var(--code);
+    font-weight: 700;
+    font-stretch: normal;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-shadow: 0 0 18px rgba(34, 211, 238, 0.4);
+  }
+  body.fx-active .count-label {
+    font-family: var(--ui);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+  body.fx-active .tally svg line { stroke: var(--ink-2); }
+  body.fx-active .tally-seal svg line { stroke: var(--seal); }
+  body.fx-active .tally-indigo svg line { stroke: var(--indigo); }
+
+  /* =========================================================================
+     MASTHEAD — a floating glass command bar
+     ========================================================================= */
+
+  body.fx-active .masthead {
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom: 0;
+    padding: 14px 0 18px;
+    background-image: linear-gradient(to bottom,
+      rgba(5, 8, 15, 0.55) 0 40%, transparent 100%);
+  }
+
+  body.fx-active .masthead-in {
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--card) 78%, transparent),
+        color-mix(in srgb, #05080f 82%, transparent));
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    padding: 7px 9px 7px 20px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+      0 18px 60px -30px rgba(34, 211, 238, 0.5);
+    position: relative;
+    isolation: isolate;
+  }
+
+  body.fx-active .masthead-in::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(120deg,
+      transparent 20%, rgba(34, 211, 238, 0.12) 50%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body.fx-active .wordmark { color: var(--ink); }
+  body.fx-active .wordmark-marks i {
+    background: linear-gradient(180deg, var(--indigo), var(--seal));
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
+  }
+  body.fx-active .wordmark-name {
+    letter-spacing: 0.03em;
+    font-weight: 650;
+    text-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+  }
+
+  body.fx-active .nav { gap: 8px; }
+  body.fx-active .nav a {
+    color: var(--ink-2);
+    border: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-radius: 999px;
+    padding: 8px 14px;
+    transition: color 0.15s linear, border-color 0.15s linear,
+      background 0.15s linear, box-shadow 0.15s linear;
+  }
+  body.fx-active .nav a:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--indigo-wash) 55%, transparent);
+    border-color: color-mix(in srgb, var(--indigo) 45%, transparent);
+    box-shadow: 0 0 18px -8px rgba(34, 211, 238, 0.7);
+  }
+  body.fx-active .nav a[aria-current="page"] {
+    color: #0a0f1a;
+    background: linear-gradient(180deg, var(--indigo), color-mix(in srgb, var(--indigo) 55%, #fff));
+    border-color: transparent;
+    text-shadow: none;
+    box-shadow: 0 0 22px -6px rgba(34, 211, 238, 0.9);
+  }
+
+  /* =========================================================================
+     THE HERO STAGE — centred, cinematic, with orbit rings behind the copy.
+     ========================================================================= */
+
+  body.fx-active .hero {
+    position: relative;
+    overflow: clip;
+    display: grid;
+    place-items: center;
+    min-height: min(920px, calc(100vh - 110px));
+    padding-block: clamp(56px, 10vh, 110px);
+    text-align: center;
+  }
+
+  /* Auroral atmosphere behind the copy. */
+  body.fx-active .hero::before {
+    content: "";
+    position: absolute;
+    inset: -40% -12%;
+    z-index: -1;
+    background:
+      radial-gradient(48% 54% at 34% 38%, rgba(34, 211, 238, 0.16), transparent 70%),
+      radial-gradient(42% 50% at 72% 30%, rgba(255, 59, 107, 0.11), transparent 70%),
+      radial-gradient(54% 60% at 60% 82%, rgba(124, 58, 237, 0.13), transparent 72%);
+  }
+
+  /* Orbit rings: concentric instrument guides behind the headline, slowly
+     rotating (the `rotate` property leaves the centring transform alone). */
+  body.fx-active .hero::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(86vw, 820px);
+    aspect-ratio: 1;
+    z-index: -1;
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle,
+        transparent 0 calc(96px - 2px),
+        rgba(34, 211, 238, 0.09) calc(96px - 2px) 96px),
+      conic-gradient(from 120deg,
+        transparent 0 42%, rgba(34, 211, 238, 0.30) 46% 47%,
+        transparent 51% 66%, rgba(255, 59, 107, 0.22) 70% 71%,
+        transparent 75% 86%, rgba(192, 132, 252, 0.26) 90% 91%, transparent 95%);
+    -webkit-mask-image: radial-gradient(circle, transparent 0 12%, #000 14% 100%);
+    mask-image: radial-gradient(circle, transparent 0 12%, #000 14% 100%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  body.fx-active .hero-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(30px, 5vh, 54px);
+    width: min(920px, 100%);
+    margin-inline: auto;
+  }
+
+  body.fx-active .hero > h1, body.fx-active .hero .hero-grid > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    body.fx-active .hero h1 {
+      background: linear-gradient(115deg,
+        #eef7ff 0%, var(--indigo) 32%, #c084fc 66%, #f0abfc 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.35));
+    }
+  }
+
+  body.fx-active .hero h1 {
+    font-size: clamp(44px, 8vw, 104px);
+    font-weight: 630;
+    line-height: 0.97;
+    letter-spacing: -0.035em;
+    max-width: 14ch;
+    text-wrap: balance;
+  }
+
+  body.fx-active .hero-sub {
+    font-family: var(--ui);
+    font-weight: 420;
+    font-size: clamp(16px, 1.4vw, 20px);
+    line-height: 1.65;
+    letter-spacing: 0.005em;
+    max-width: 52ch;
+    margin-inline: auto;
+  }
+
+  body.fx-active .hero-actions {
+    justify-content: center;
+    gap: 14px;
+  }
+
+  /* The college-front kicker line: uppercase, spaced, faint. */
+  body.fx-active .hero p.t-xs.faint {
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    font-size: 10.5px;
+    color: var(--ink-3);
+    margin-inline: auto;
+  }
+
+  /* ---- the telemetry deck ------------------------------------------------ */
+
+  /* Home: the register is no longer a side card. It is a wide instrument deck
+     under the headline — headline, deck, actions, reading down the page. */
+  body.fx-active .hero .register {
+    width: min(780px, 100%);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 16px clamp(28px, 5vw, 64px);
+    align-items: center;
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--indigo) 36%, transparent);
+    border-radius: 20px;
+    background: var(--glass);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+      0 44px 120px -44px rgba(34, 211, 238, 0.55);
+    animation: fx-bob 8s ease-in-out infinite;
+  }
+
+  body.fx-active .hero .register-head {
+    grid-column: 1 / -1;
+    border-bottom-color: color-mix(in srgb, var(--indigo) 24%, transparent);
+    padding-bottom: 14px;
+  }
+  body.fx-active .hero .register-title {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    color: var(--indigo);
+    text-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+  }
+  body.fx-active .hero .register-date { font-family: var(--code); color: var(--ink-3); }
+  body.fx-active .hero .register-head::after {
+    content: "● LIVE";
+    font: 600 9px/1 var(--code);
+    letter-spacing: 0.22em;
+    color: var(--green);
+    text-shadow: 0 0 10px rgba(52, 224, 179, 0.7);
+  }
+
+  body.fx-active .hero .count {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    justify-self: stretch;
+  }
+  body.fx-active .hero .count-n {
+    font-size: clamp(30px, 4.4vw, 44px);
+    text-shadow: 0 0 26px rgba(34, 211, 238, 0.55);
+  }
+  body.fx-active .hero .count-marks { margin-top: 0; }
+  body.fx-active .hero .register p { margin: 0; }
+
+  /* College front: the health panel becomes the same instrument deck. */
+  body.fx-active .hero .panel-seal {
+    width: min(780px, 100%);
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--seal) 42%, transparent);
+    border-radius: 20px;
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+      inset 0 0 60px -34px rgba(255, 59, 107, 0.5),
+      0 0 80px -40px rgba(255, 59, 107, 0.8);
+  }
+  body.fx-active .hero .panel-seal .panel-title {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    color: #ffd3dd;
+    text-shadow: 0 0 12px rgba(255, 59, 107, 0.6);
+  }
+  body.fx-active .hero .panel-seal .panel-head {
+    background: color-mix(in srgb, var(--seal-wash) 60%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--seal) 22%, transparent);
+  }
+  body.fx-active .hero .panel-seal .grid { gap: 26px clamp(28px, 5vw, 64px); }
+  body.fx-active .hero .panel-seal .count-n {
+    text-shadow: 0 0 26px rgba(255, 59, 107, 0.55);
+  }
+
+  /* =========================================================================
+     SECTIONS — framed as numbered sectors of the flight plan
+     ========================================================================= */
+
+  body.fx-active #view { counter-reset: sector; }
+  body.fx-active #view > .shell > [class*="band"] { counter-increment: sector; }
+
+  body.fx-active #view > .shell > [class*="band"] {
+    border-top: 0;
+    transform-origin: 50% 10%;
+    will-change: transform, opacity;
+  }
+
+  /* The SECTOR tag sits top-left on the hero, as an entry stamp. */
+  body.fx-active #view > .shell:first-child > [class*="band"]::before {
+    content: "SECTOR " counter(sector, decimal-leading-zero) " — ENTRY";
+    position: absolute;
+    top: calc(clamp(56px, 10vh, 110px) - 46px);
+    left: 0;
+    font: 600 9.5px/1 var(--code);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* Every other sector gets its tag above the content, followed by a gradient
+     rule to close the section. */
+  body.fx-active #view > .shell:not(:first-child) > [class*="band"]::before {
+    content: "SECTOR " counter(sector, decimal-leading-zero);
+    display: block;
+    font: 600 10.5px/1 var(--code);
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--indigo) 72%, transparent);
+    text-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+    margin-bottom: 22px;
+  }
+
+  body.fx-active #view > .shell > [class*="band"]::after {
+    content: "";
+    display: block;
+    height: 1px;
+    margin-top: 30px;
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--indigo) 42%, transparent),
+      transparent 72%);
+  }
+
+  body.fx-active .band {
+    padding-block: clamp(64px, 9vh, 120px);
+    border-top-color: color-mix(in srgb, var(--indigo) 16%, transparent);
+  }
+
+  /* Section headers: big display titles with a gradient tick. */
+  body.fx-active #view > .shell section h2.t-md {
+    font-size: clamp(26px, 3.6vw, 44px);
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    max-width: 26ch;
+  }
+  body.fx-active #view > .shell section h2.t-md::after {
+    content: "";
+    display: block;
+    width: 72px;
+    height: 3px;
+    margin-top: 16px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--indigo), var(--seal));
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.5);
+  }
+
+  /* The band-sunk slab: a big glass deck that holds a search console and cards. */
+  body.fx-active .band-sunk {
+    position: relative;
+    border-radius: 20px;
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--indigo-wash) 34%, transparent),
+        transparent 24%),
+      color-mix(in srgb, var(--paper-2) 70%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--edge);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 50px 110px -60px rgba(34, 211, 238, 0.45);
+    padding: clamp(26px, 4vw, 56px);
+  }
+
+  /* =========================================================================
+     GLASS CARDS & PANELS
+     ========================================================================= */
+
+  body.fx-active .panel,
+  body.fx-active .register,
+  body.fx-active .receipt,
+  body.fx-active .trace,
+  body.fx-active .pill,
+  body.fx-active .notice,
+  body.fx-active .sheet-panel,
+  body.fx-active .modal-panel,
+  body.fx-active .toast,
+  body.fx-active .steps,
+  body.fx-active .textarea {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    backdrop-filter: blur(12px) saturate(1.3);
+    border-color: color-mix(in srgb, var(--ink) 26%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 24px 60px -34px rgba(0, 0, 0, 0.85);
+  }
+
+  body.fx-active .panel, body.fx-active .register, body.fx-active .receipt {
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+  }
+
+  body.fx-active .panel {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  }
+  body.fx-active .panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent, rgba(34, 211, 238, 0.6) 30%, rgba(255, 59, 107, 0.5) 70%, transparent);
+    opacity: 0.6;
+  }
+  body.fx-active .panel:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--indigo) 55%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 34px 90px -44px rgba(0, 0, 0, 0.9),
+      0 0 60px -28px rgba(34, 211, 238, 0.55);
+  }
+
+  body.fx-active .panel-head {
+    border-bottom-color: color-mix(in srgb, var(--ink) 15%, transparent);
+    padding: 16px 22px;
+  }
+  body.fx-active .panel-title {
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 650;
+    color: var(--ink-2);
+  }
+  body.fx-active .panel-body { padding: 22px; }
+  body.fx-active .panel-body-tight { padding: 16px 22px; }
+  body.fx-active .panel-foot {
+    background: color-mix(in srgb, var(--paper-3) 70%, transparent);
+    border-top-color: color-mix(in srgb, var(--ink) 15%, transparent);
+    border-radius: 0 0 14px 14px;
+  }
+
+  body.fx-active .panel-seal {
+    border-color: color-mix(in srgb, var(--seal) 42%, transparent);
+    box-shadow:
+      inset 0 0 30px -18px rgba(255, 59, 107, 0.55),
+      0 0 60px -30px rgba(255, 59, 107, 0.7);
+  }
+  body.fx-active .panel-seal .panel-head {
+    background: color-mix(in srgb, var(--seal-wash) 70%, transparent);
+    color: #ffd3dd;
+  }
+  body.fx-active .panel-seal .panel-title { color: #ffd3dd; text-shadow: 0 0 12px rgba(255, 59, 107, 0.6); }
+
+  body.fx-active .panel-seal:hover {
+    border-color: color-mix(in srgb, var(--seal) 62%, transparent);
+    box-shadow:
+      inset 0 0 40px -20px rgba(255, 59, 107, 0.65),
+      0 0 90px -36px rgba(255, 59, 107, 0.95);
+  }
+
+  /* Receipt: the one-time trace-code stub, as a terminal hand-off. */
+  body.fx-active .receipt {
+    border: 1px solid color-mix(in srgb, var(--indigo) 38%, transparent);
+    border-radius: 18px;
+    padding: clamp(22px, 4vw, 44px);
+  }
+  body.fx-active .receipt::before, body.fx-active .receipt::after {
+    width: 16px;
+    height: 16px;
+    border-color: var(--seal);
+    filter: drop-shadow(0 0 6px rgba(255, 59, 107, 0.8));
+  }
+
+  /* =========================================================================
+     ENTRIES — the feed reads as ops cards on a glass grid, not ledger rows
+     ========================================================================= */
+
+  body.fx-active #view .entries {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 16px;
+    border-top: 0;
+  }
+
+  body.fx-active .entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border: 1px solid var(--edge);
+    border-left-width: 3px;
+    border-left-color: color-mix(in srgb, var(--indigo) 26%, transparent);
+    border-radius: 16px;
+    background: var(--glass-2);
+    transition: transform 0.18s ease, border-color 0.18s ease,
+      background 0.18s linear, box-shadow 0.18s ease;
+  }
+  body.fx-active .entry:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--indigo) 55%, transparent);
+    background: color-mix(in srgb, var(--indigo-wash) 30%, transparent);
+    box-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.9),
+      0 0 50px -24px rgba(34, 211, 238, 0.55);
+  }
+  body.fx-active .entry-urgent {
+    border-left-color: var(--seal);
+    border-color: color-mix(in srgb, var(--seal) 42%, transparent);
+  }
+  body.fx-active .entry-title a { color: var(--ink); text-decoration: none; }
+  body.fx-active .entry-head { flex-wrap: wrap; }
+  body.fx-active .entry-foot { gap: 16px; margin-top: auto; }
+  body.fx-active .entry-body { color: var(--ink-2); }
+
+  body.fx-active .facts { gap: 10px 26px; }
+  body.fx-active .fact-k {
+    font-family: var(--ui);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 9.5px;
+    color: var(--ink-3);
+  }
+  body.fx-active .fact-v { font-family: var(--code); font-size: 12px; }
+
+  body.fx-active .thread, body.fx-active .line { border-top-color: color-mix(in srgb, var(--ink) 12%, transparent); }
+  body.fx-active .msg { grid-template-columns: 150px minmax(0, 1fr); border-bottom-color: color-mix(in srgb, var(--ink) 9%, transparent); }
+  body.fx-active .msg-who { letter-spacing: 0.04em; }
+  body.fx-active .msg-reporter .msg-who { color: var(--indigo); text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+  body.fx-active .msg-desk .msg-who { color: var(--seal); text-shadow: 0 0 10px rgba(255, 59, 107, 0.5); }
+  body.fx-active .msg-note { background: color-mix(in srgb, var(--amber-wash) 45%, transparent); border-left: 2px solid var(--amber); }
+
+  /* The report timeline (in a panel): the glass spine version. */
+  body.fx-active .line-item::before {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--indigo) 55%, transparent), transparent);
+  }
+  body.fx-active .line-now .line-node {
+    border-color: var(--seal);
+    background: var(--seal);
+    box-shadow: 0 0 14px rgba(255, 59, 107, 0.95);
+  }
+  body.fx-active .line-item .line-node {
+    border-color: color-mix(in srgb, var(--indigo) 60%, transparent);
+    background: color-mix(in srgb, var(--indigo-wash) 55%, transparent);
+  }
+
+  /* =========================================================================
+     THE MISSION MAP — "How it works" as launch stages, not a timeline
+     ========================================================================= */
+
+  body.fx-active section.band:has(> .line.gutter-top) {
+    counter-reset: stage;
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    border-top: 0;
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line-item {
+    counter-increment: stage;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 26px;
+    border: 1px solid var(--edge);
+    border-radius: 18px;
+    background: var(--glass-2);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line-item::before { display: none; }
+  body.fx-active section.band:has(> .line.gutter-top) .line-node { display: none; }
+  body.fx-active section.band:has(> .line.gutter-top) .line-item:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--indigo) 55%, transparent);
+    box-shadow: 0 26px 66px -36px rgba(0, 0, 0, 0.9),
+      0 0 52px -24px rgba(34, 211, 238, 0.5);
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line-what {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font: 650 clamp(17px, 2.2vw, 21px)/1.2 var(--ui);
+    color: var(--ink);
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line-what::before {
+    content: "0" counter(stage);
+    font: 700 clamp(20px, 2.6vw, 26px)/1 var(--code);
+    color: var(--indigo);
+    text-shadow: 0 0 18px rgba(34, 211, 238, 0.6);
+  }
+  body.fx-active section.band:has(> .line.gutter-top) .line-note {
+    color: var(--ink-2);
+    margin: 0;
+  }
+
+  /* =========================================================================
+     CHOICE CARDS — neon selector chips
+     ========================================================================= */
+
+  body.fx-active .choices { gap: 12px; }
+  body.fx-active .choice {
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-left-width: 3px;
+    background: var(--glass-2);
+    transition: border-color 0.14s linear, background 0.14s linear, transform 0.16s ease, box-shadow 0.16s ease;
+  }
+  body.fx-active .choice:hover {
+    border-color: color-mix(in srgb, var(--indigo) 55%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px -24px rgba(34, 211, 238, 0.55);
+  }
+  body.fx-active .choice[data-picked="true"] {
+    border-left-color: var(--seal);
+    border-color: color-mix(in srgb, var(--seal) 55%, transparent);
+    background: color-mix(in srgb, var(--seal-wash) 48%, transparent);
+    box-shadow: 0 0 34px -14px rgba(255, 59, 107, 0.65);
+  }
+  body.fx-active .choice[data-picked="true"] .choice-mark {
+    border-color: var(--seal);
+    background: var(--seal);
+    box-shadow: 0 0 14px rgba(255, 59, 107, 0.9);
+  }
+  body.fx-active .choice-mark {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--ink-3);
+  }
+  body.fx-active .choice-title { color: var(--ink); letter-spacing: 0.02em; }
+
+  /* Category board cards get a quiet corner tick on hover. */
+  body.fx-active section.band .grid.grid-3 .choice {
+    position: relative;
+  }
+  body.fx-active section.band .grid.grid-3 .choice::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid var(--indigo);
+    border-right: 1px solid var(--indigo);
+    opacity: 0.35;
+    transition: opacity 0.18s linear;
+  }
+  body.fx-active section.band .grid.grid-3 .choice:hover::after { opacity: 1; }
+
+  /* =========================================================================
+     FORMS — inputs as glowing underlines; search as a console bar
+     ========================================================================= */
+
+  body.fx-active .label {
+    font-family: var(--ui);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10.5px;
+    color: var(--ink-2);
+  }
+  body.fx-active .hint { color: var(--ink-3); font-size: 12px; }
+
+  body.fx-active .input, body.fx-active .select, body.fx-active .textarea {
+    color: var(--ink);
+    border-bottom-color: color-mix(in srgb, var(--indigo) 40%, transparent);
+    transition: border-color 0.15s linear, box-shadow 0.15s linear, background 0.15s linear;
+  }
+  body.fx-active .input::placeholder, body.fx-active .textarea::placeholder {
+    color: var(--ink-3);
+    font-style: normal;
+  }
+  body.fx-active .input:focus, body.fx-active .select:focus, body.fx-active .textarea:focus {
+    outline: none;
+    border-color: var(--indigo);
+    box-shadow:
+      0 1px 0 0 var(--indigo),
+      0 14px 34px -16px rgba(34, 211, 238, 0.65);
+    text-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
+  }
+  body.fx-active .textarea {
+    border: 1px solid color-mix(in srgb, var(--indigo) 34%, transparent);
+    border-radius: 12px;
+  }
+  body.fx-active .field-bad .input, body.fx-active .field-bad .textarea, body.fx-active .field-bad .select {
+    border-color: var(--seal);
+    box-shadow: 0 1px 0 0 var(--seal), 0 14px 34px -16px rgba(255, 59, 107, 0.65);
+  }
+  body.fx-active .field .counter {
+    display: block;
+    margin-top: 8px;
+    font: 10px/1 var(--code);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  body.fx-active .field .counter.counter-bad {
+    color: var(--seal);
+    text-shadow: 0 0 10px rgba(255, 59, 107, 0.5);
+  }
+
+  /* The college search becomes a wide command bar. */
+  body.fx-active #picker .input {
+    height: 60px;
+    padding: 0 20px;
+    min-height: 60px;
+    font-size: clamp(16px, 2vw, 20px);
+    font-family: var(--ui);
+    border: 1px solid color-mix(in srgb, var(--indigo) 34%, transparent);
+    border-radius: 14px;
+    background: rgba(5, 8, 15, 0.55);
+    box-shadow: inset 0 0 30px -18px rgba(34, 211, 238, 0.5);
+  }
+  body.fx-active #picker .input:focus {
+    border-color: var(--indigo);
+    box-shadow: 0 0 40px -14px rgba(34, 211, 238, 0.75),
+      inset 0 0 30px -16px rgba(34, 211, 238, 0.45);
+  }
+
+  body.fx-active .switch-track {
+    background: var(--paper-3);
+    border-color: color-mix(in srgb, var(--indigo) 38%, transparent);
+  }
+  body.fx-active .switch input:checked + .switch-track {
+    background: color-mix(in srgb, var(--indigo-wash) 65%, transparent);
+    border-color: var(--indigo);
+    box-shadow: 0 0 18px -6px var(--indigo);
+  }
+  body.fx-active .switch input:checked + .switch-track::after { background: var(--indigo); box-shadow: 0 0 10px var(--indigo); }
+
+  /* =========================================================================
+     BUTTONS — neon glass, active pulse, hover shimmer sweep
+     ========================================================================= */
+
+  body.fx-active .btn {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--indigo) 55%, transparent);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--indigo) 16%, transparent),
+      color-mix(in srgb, var(--indigo) 5%, transparent));
+    color: #dff6ff;
+    box-shadow:
+      0 0 24px -10px rgba(34, 211, 238, 0.6),
+      inset 0 0 16px -12px rgba(34, 211, 238, 0.7);
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.55);
+    transition: border-color 0.15s linear, background 0.15s linear,
+      color 0.15s linear, box-shadow 0.15s linear, transform 0.15s ease;
+  }
+  body.fx-active .btn:hover {
+    border-color: var(--seal);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--seal) 24%, transparent),
+      color-mix(in srgb, var(--seal) 8%, transparent));
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow:
+      0 10px 38px -10px rgba(255, 59, 107, 0.7),
+      inset 0 0 18px -12px rgba(255, 59, 107, 0.8);
+    text-shadow: 0 0 14px rgba(255, 59, 107, 0.7);
+  }
+  body.fx-active .btn-seal {
+    border-color: var(--seal);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--seal) 36%, transparent),
+      color-mix(in srgb, var(--seal) 15%, transparent));
+    box-shadow: 0 0 34px -10px rgba(255, 59, 107, 0.8), inset 0 0 20px -12px rgba(255, 59, 107, 0.8);
+    text-shadow: 0 0 14px rgba(255, 120, 170, 0.85);
+  }
+  body.fx-active .btn-line, body.fx-active .btn-quiet { background: transparent; }
+  body.fx-active .btn-quiet:hover { background: color-mix(in srgb, var(--indigo-wash) 45%, transparent); color: var(--indigo); }
+
+  /* =========================================================================
+     STATUS MARKS — pills, priorities, chips, response clock
+     ========================================================================= */
+
+  body.fx-active .pill {
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+    padding: 6px 12px 6px 10px;
+  }
+  body.fx-active .pill::before {
+    box-shadow: 0 0 10px currentColor;
+  }
+  body.fx-active .pill-open::before, body.fx-active .pill-received::before {
+    background: var(--indigo);
+    color: var(--indigo);
+  }
+  body.fx-active .pill-resolved::before, body.fx-active .pill-closed::before {
+    background: var(--green);
+    color: var(--green);
+  }
+  body.fx-active .pill-overdue {
+    border-color: color-mix(in srgb, var(--seal) 55%, transparent);
+    background: color-mix(in srgb, var(--seal-wash) 55%, transparent);
+    color: #ffb6c6;
+  }
+
+  body.fx-active .prio-urgent i, body.fx-active .prio-high i {
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+
+  body.fx-active .clock-text {
+    font-family: var(--ui);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10.5px;
+    color: var(--ink-2);
+  }
+  body.fx-active .clock-fill {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--green) 50%, #0afffa), var(--green));
+    box-shadow: 0 0 16px rgba(52, 224, 179, 0.6);
+  }
+  body.fx-active .clock-soon .clock-fill {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--amber) 50%, #ff8c1a), var(--amber));
+    box-shadow: 0 0 16px rgba(255, 184, 77, 0.55);
+  }
+  body.fx-active .clock-late .clock-fill {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--seal) 50%, #ff0044), var(--seal));
+    box-shadow: 0 0 16px rgba(255, 59, 107, 0.7);
+  }
+
+  /* =========================================================================
+     PROGRESS / TIME RAILS — the wizard, the trace
+     ========================================================================= */
+
+  body.fx-active .steps {
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    padding: 6px;
+    background: color-mix(in srgb, var(--card) 60%, transparent);
+  }
+  body.fx-active .step {
+    border-radius: 9px;
+    border-right-color: transparent;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 10px;
+  }
+  body.fx-active .step-n {
+    width: 22px;
+    height: 22px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-family: var(--code);
+    font-weight: 700;
+  }
+  body.fx-active .step[data-state="done"] { color: var(--indigo-2); }
+  body.fx-active .step[data-state="done"] .step-n {
+    background: color-mix(in srgb, var(--indigo-2) 25%, transparent);
+    border-color: var(--indigo-2);
+    color: var(--indigo-2);
+  }
+  body.fx-active .step[data-state="now"] {
+    color: var(--indigo);
+    background: color-mix(in srgb, var(--indigo-wash) 40%, transparent);
+    box-shadow: inset 0 -2px 0 0 var(--indigo);
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+  }
+  body.fx-active .step[data-state="now"] .step-n {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: #04070f;
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.9);
+  }
+
+  body.fx-active .trace {
+    font-family: var(--code);
+    border: 1px dashed color-mix(in srgb, var(--indigo) 60%, transparent);
+    background: color-mix(in srgb, var(--indigo-wash) 32%, transparent);
+    color: var(--ink);
+    text-shadow: 0 0 14px rgba(34, 211, 238, 0.55);
+    letter-spacing: 0.16em;
+  }
+  body.fx-active .trace-lg {
+    border-style: solid;
+    border-color: var(--indigo);
+    box-shadow: 0 0 30px -10px rgba(34, 211, 238, 0.7);
+    padding: 14px 18px;
+    font-size: var(--t-xl);
+  }
+
+  body.fx-active .back { border-radius: 10px; }
+  body.fx-active .back[data-backed="true"] {
+    background: color-mix(in srgb, var(--seal-wash) 55%, transparent);
+    border-color: var(--seal);
+    box-shadow: 0 0 20px -8px rgba(255, 59, 107, 0.7);
+  }
+
+  /* =========================================================================
+     TABS, CHIPS, NOTICES, TABLES
+     ========================================================================= */
+
+  body.fx-active .tabs { border-bottom-color: color-mix(in srgb, var(--indigo) 26%, transparent); gap: 6px; }
+  body.fx-active .tab {
+    border-radius: 999px;
+    padding: 8px 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10.5px;
+    border-bottom: 2px solid transparent;
+  }
+  body.fx-active .tab:hover { color: var(--indigo); background: color-mix(in srgb, var(--indigo-wash) 40%, transparent); }
+  body.fx-active .tab[aria-selected="true"] {
+    color: #04070f;
+    border-bottom-color: transparent;
+    background: linear-gradient(180deg, var(--indigo), color-mix(in srgb, var(--indigo) 55%, #fff));
+    text-shadow: none;
+    box-shadow: 0 0 22px -6px rgba(34, 211, 238, 0.9);
+  }
+  body.fx-active .tab-n {
+    font-family: var(--code);
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+    border-radius: 999px;
+    background: rgba(5, 8, 15, 0.5);
+    color: var(--ink-2);
+  }
+
+  body.fx-active .chip {
+    border-radius: 999px;
+    border-color: color-mix(in srgb, var(--indigo) 30%, transparent);
+    background: color-mix(in srgb, var(--indigo-wash) 36%, transparent);
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 9.5px;
+  }
+
+  body.fx-active .notice {
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--indigo) 25%, transparent);
+    border-left: 3px solid var(--indigo);
+  }
+  body.fx-active .notice-good { border-left-color: var(--green); box-shadow: 0 0 28px -14px rgba(52, 224, 179, 0.6); }
+  body.fx-active .notice-bad { border-left-color: var(--seal); background: color-mix(in srgb, var(--seal-wash) 45%, transparent); }
+  body.fx-active .notice-warn { border-left-color: var(--amber); }
+
+  body.fx-active .warn {
+    border: 1px solid color-mix(in srgb, var(--amber) 42%, transparent);
+    border-radius: 12px;
+    box-shadow: 0 0 30px -16px rgba(255, 184, 77, 0.5);
+  }
+  body.fx-active .warn-hard {
+    border-color: color-mix(in srgb, var(--seal) 50%, transparent);
+    box-shadow: 0 0 30px -16px rgba(255, 59, 107, 0.6);
+  }
+
+  body.fx-active .sheet { font-family: var(--ui); }
+  body.fx-active .sheet th {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 9.5px;
+    color: var(--ink-3);
+    border-bottom-color: color-mix(in srgb, var(--indigo) 30%, transparent);
+  }
+  body.fx-active .sheet td {
+    border-bottom-color: color-mix(in srgb, var(--ink) 9%, transparent);
+    font-family: var(--ui);
+  }
+  body.fx-active .sheet td, body.fx-active .sheet .sheet-num { font-family: var(--ui); }
+  body.fx-active .sheet tbody tr:hover {
+    background: color-mix(in srgb, var(--indigo-wash) 28%, transparent);
+  }
+
+  /* =========================================================================
+     OVERLAYS + HUD
+     ========================================================================= */
+
+  body.fx-active .sheet-panel, body.fx-active .modal-panel {
+    background: color-mix(in srgb, #070b14 90%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid color-mix(in srgb, var(--indigo) 28%, transparent);
+    box-shadow: -40px 0 120px -40px rgba(34, 211, 238, 0.3);
+  }
+  body.fx-active .sheet-panel { border-radius: 0; }
+  body.fx-active .modal-panel { border-radius: 18px; }
+  body.fx-active .sheet-veil, body.fx-active .modal .sheet-veil {
+    background: rgba(2, 4, 9, 0.76);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+  body.fx-active .sheet-head {
+    background: color-mix(in srgb, #070b14 88%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--indigo) 22%, transparent);
+  }
+  body.fx-active .toast { border-radius: 12px; border-left-width: 3px; }
+  body.fx-active .toast-good { border-left-color: var(--green); box-shadow: 0 0 28px -10px rgba(52, 224, 179, 0.7); }
+  body.fx-active .toast-bad { border-left-color: var(--seal); box-shadow: 0 0 28px -10px rgba(255, 59, 107, 0.75); }
+
+  .fx-hud {
+    position: fixed;
+    right: 18px;
+    bottom: 16px;
+    z-index: 55;
+    font: 11px/1.75 var(--code);
+    letter-spacing: 0.07em;
+    color: color-mix(in srgb, var(--indigo) 74%, transparent);
+    background: linear-gradient(180deg, rgba(7, 11, 20, 0.85), rgba(7, 11, 20, 0.62));
+    border: 1px solid color-mix(in srgb, var(--indigo) 26%, transparent);
+    border-radius: 8px;
+    padding: 8px 12px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 18px 54px -28px rgba(34, 211, 238, 0.5);
+    min-width: 196px;
+  }
+  .fx-hud .fx-hud-ok { color: var(--green); text-shadow: 0 0 8px rgba(52, 224, 179, 0.7); float: right; }
+  .fx-hud .fx-hud-caret { color: var(--seal); text-shadow: 0 0 9px rgba(255, 59, 107, 0.85); }
+  .fx-hud .fx-hud-time { opacity: 0.8; font-size: 10px; color: var(--ink-2); }
+
+  /* =========================================================================
+     FOOTER — ground control
+     ========================================================================= */
+
+  body.fx-active .foot {
+    position: relative;
+    border-top: 1px solid color-mix(in srgb, var(--indigo) 26%, transparent);
+    margin-top: var(--s8);
+    padding-block: calc(var(--s5) + 6px) var(--s6);
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+    background:
+      radial-gradient(60% 120% at 50% 0%, rgba(34, 211, 238, 0.08), transparent 60%),
+      linear-gradient(180deg, transparent, color-mix(in srgb, #070b14 70%, transparent));
+  }
+  body.fx-active .foot h4 {
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 10.5px;
+  }
+  body.fx-active .foot-links a { color: var(--ink-2); }
+  body.fx-active .foot-links a:hover { color: var(--indigo); text-shadow: 0 0 12px rgba(34, 211, 238, 0.5); }
+
+  /* =========================================================================
+     MOTION — gated, gentle, purposeful
+     ========================================================================= */
+
+  @media (prefers-reduced-motion: no-preference) {
+
+    @keyframes fx-orbit {
+      to { rotate: 360deg; }
+    }
+    body.fx-active .hero::after {
+      animation: fx-orbit 90s linear infinite;
+    }
+
+    /* Section enter on every route change. fx.js drops .fx-enter on animationend. */
+    @keyframes fx-enter {
+      from { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(3px); }
+      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    body.fx-active #view > .shell.fx-enter {
+      animation: fx-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    body.fx-active #view > .shell.fx-enter:nth-child(2) { animation-delay: 0.06s; }
+    body.fx-active #view > .shell.fx-enter:nth-child(3) { animation-delay: 0.12s; }
+    body.fx-active #view > .shell.fx-enter:nth-child(n + 4) { animation-delay: 0.16s; }
+
+    /* Entrance rise for cards and rows. Removed on animationend so it never
+       pins a transform over the pointer tilt. */
+    @keyframes fx-rise {
+      from { opacity: 0; transform: translate3d(0, 42px, -130px) rotateX(24deg) scale(0.95); filter: blur(4px); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); filter: blur(0); }
+    }
+    body.fx-active .fx-rise {
+      animation: fx-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    body.fx-active .fx-tilt {
+      transition: transform 0.16s ease-out;
+      will-change: transform;
+      transform-style: preserve-3d;
+    }
+    body.fx-active .register.fx-tilt, body.fx-active .hero .register {
+      transition: transform 0.16s ease-out, box-shadow 0.16s ease-out;
+    }
+    body.fx-active .choice.fx-tilt {
+      transition: border-color 0.12s linear, background 0.12s linear, transform 0.16s ease-out, box-shadow 0.16s ease-out;
+    }
+
+    /* Gently bobbing telemetry deck. */
+    @keyframes fx-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* The corner HUD caret. */
+    .fx-hud .fx-hud-caret { animation: fx-blink 1.1s steps(1, end) infinite; }
+    @keyframes fx-blink { 50% { opacity: 0; } }
+
+    /* The top beam sweeps, the scanlines crawl. */
+    .fx-beam { animation: fx-sweep 7s ease-in-out infinite alternate; }
+    @keyframes fx-sweep {
+      from { background-position: 0% 0; }
+      to   { background-position: 100% 0; }
+    }
+    .fx-scan { animation: fx-crawl 9s linear infinite; }
+    @keyframes fx-crawl {
+      from { background-position: 0 0; }
+      to   { background-position: 0 48px; }
+    }
+
+    /* Button hover shimmer. */
+    body.fx-active .btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -70%;
+      width: 45%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.26), transparent);
+      transform: skewX(-20deg);
+      pointer-events: none;
+    }
+    @keyframes fx-btn-shimmer {
+      from { left: -70%; }
+      to   { left: 130%; }
+    }
+    body.fx-active .btn:hover::after { animation: fx-btn-shimmer 0.7s ease; }
+
+    /* The gradient headline slowly shifts hue. */
+    @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+      body.fx-active .hero h1 { animation: fx-hue 10s ease-in-out infinite alternate; }
+    }
+    @keyframes fx-hue {
+      from { background-position: 0% 0; }
+      to   { background-position: 100% 0; }
+    }
+
+    /* Identifier pulse on the wordmark, synced to the HUD caret. */
+    @keyframes fx-id {
+      0%, 100% { color: var(--ink); text-shadow: 0 0 0 transparent; }
+      45%, 55% { color: var(--indigo); text-shadow: 0 0 18px rgba(34, 211, 238, 0.7); }
+    }
+    body.fx-active .wordmark-name {
+      animation: fx-id 4s ease-in-out infinite;
+    }
+
+    /* The busy state draws as a slowly sweeping beam across the skeleton. */
+    body.fx-active .band-flush:has(.load) {
+      position: relative;
+      overflow: hidden;
+    }
+    body.fx-active .band-flush:has(.load)::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: -30%;
+      width: 30%;
+      background: linear-gradient(90deg, transparent,
+        rgba(34, 211, 238, 0.14),
+        rgba(255, 255, 255, 0.08),
+        transparent);
+      transform: skewX(-18deg);
+      pointer-events: none;
+      animation: fx-busy-sweep 1.6s ease-in-out infinite;
+    }
+    @keyframes fx-busy-sweep {
+      from { left: -30%; }
+      to   { left: 105%; }
+    }
+    body.fx-active .load i {
+      background: linear-gradient(90deg, var(--paper-3) 25%,
+        color-mix(in srgb, var(--indigo) 55%, var(--paper-3)) 50%,
+        var(--paper-3) 75%);
+      background-size: 200% 100%;
+      animation: fx-loadshimmer 1.4s linear infinite;
+    }
+    @keyframes fx-loadshimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+  }
+
+  /* =========================================================================
+     NARROW SCREENS
+     ========================================================================= */
+
+  @media (max-width: 1080px) {
+    body.fx-active section.band:has(> .line.gutter-top) .line {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 900px) {
+    body.fx-active .hero { min-height: 0; }
+    body.fx-active .hero h1 { font-size: clamp(36px, 11vw, 58px); }
+    body.fx-active .hero::after { width: min(120vw, 720px); }
+    body.fx-active .masthead-in { border-radius: 22px; padding: 12px 16px; }
+    body.fx-active .nav a { padding: 7px 10px; }
+    body.fx-active .hero .register,
+    body.fx-active .hero .panel-seal {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.fx-active .hero .register { text-align: center; }
+    body.fx-active .hero .register .count { justify-content: center; }
+    body.fx-active .hero .register-head { justify-content: center; }
+    .fx-hud { display: none; }
+  }
+
+  @media (max-width: 620px) {
+    body.fx-active .masthead { padding: 10px 0; }
+    body.fx-active .wordmark-name { font-size: 16px; }
+    body.fx-active .band-sunk { padding: 18px; border-radius: 16px; }
+    body.fx-active #view > .shell:not(:first-child) > [class*="band"]::before {
+      margin-bottom: 14px;
+      letter-spacing: 0.26em;
+    }
+    body.fx-active #view > .shell:first-child > [class*="band"]::before {
+      position: static;
+      margin-bottom: 18px;
+      letter-spacing: 0.26em;
+    }
+    body.fx-active .hero-actions .btn { width: 100%; }
+    body.fx-active #view .entries { grid-template-columns: minmax(0, 1fr); }
+    body.fx-active .hero .register .count { flex-direction: column; align-items: center; gap: 6px; }
+  }
+}
