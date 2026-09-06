@@ -43,7 +43,7 @@ function busy(title) {
 function nav(handle = null) {
   const links = handle
     ? [["#/c/" + handle, "Report"], ["#/c/" + handle + "/feed", "Feed"],
-      ["#/c/" + handle + "/numbers", "Response times"], ["#/trace", "Track"]]
+      ["#/c/" + handle + "/record", "Response times"], ["#/trace", "Track"]]
     : [["#/", "Colleges"], ["#/trace", "Track a report"], ["#/join", "For colleges"]];
   fill(navHost, ...links.map(([href, text]) => el("a", { href, text })));
   markNav(navHost, Router.path());
@@ -272,7 +272,7 @@ function healthPanel(health, handle) {
         fact("Typical time to resolve", health.medianResolutionHours === null
           ? "No history yet" : `${health.medianResolutionHours} hours`),
       ),
-      el("a.btn.btn-quiet.btn-sm.gutter-top", { href: `#/c/${handle}/numbers` },
+      el("a.btn.btn-quiet.btn-sm.gutter-top", { href: `#/c/${handle}/record` },
         icon("chart", "icon-sm"), "See the full record"),
     ),
   );
@@ -1954,9 +1954,11 @@ router
       el("a.btn", { href: "#/" }, "Start again")))));
   });
 
-// The old prototype served /r/:slug as a real path. Anyone holding that bookmark
-// gets sent to the hash equivalent once rather than to a blank page.
-if (location.pathname.startsWith("/r/") && !location.hash) {
+// The old prototype served /r/:slug as a real path, and college addresses shared
+// from the console use /c/<slug>. The catch-all shell serves index.html for both,
+// so anyone landing on one via a bookmark or a pasted link is sent to the hash
+// route that actually renders it — once, rather than to a blank page.
+if (!location.hash && (location.pathname.startsWith("/r/") || location.pathname.startsWith("/c/"))) {
   Router.go(`/c/${location.pathname.slice(3).replace(/\/+$/, "")}`, { replace: true });
 }
 
