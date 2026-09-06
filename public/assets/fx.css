@@ -882,17 +882,33 @@
     border-bottom-color: color-mix(in srgb, var(--indigo) 40%, transparent);
     transition: border-color 0.15s linear, box-shadow 0.15s linear, background 0.15s linear;
   }
+  body.fx-active .select {
+    /* base.css now gives every select an opaque backplate; the console theme just
+       darkens it a step further so the control reads off the page. The native
+       options list inherits this background instead of rendering blank. */
+    background-color: var(--paper-2);
+    border-bottom-color: color-mix(in srgb, var(--indigo) 40%, transparent);
+  }
+  body.fx-active .select option { background-color: var(--paper-2); color: var(--ink); }
   body.fx-active .input::placeholder, body.fx-active .textarea::placeholder {
     color: var(--ink-3);
     font-style: normal;
   }
-  body.fx-active .input:focus, body.fx-active .select:focus, body.fx-active .textarea:focus {
+  body.fx-active .input:focus, body.fx-active .textarea:focus {
     outline: none;
     border-color: var(--indigo);
     box-shadow:
       0 1px 0 0 var(--indigo),
       0 14px 34px -16px rgba(34, 211, 238, 0.65);
     text-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
+  }
+  /* The select keeps its glow box-shadow but not the text-shadow: the shadow is
+     inherited by the native popup where it blanks the options out. */
+  body.fx-active .select:focus {
+    outline: none;
+    border-color: var(--indigo);
+    box-shadow: 0 1px 0 0 var(--indigo), 0 14px 34px -16px rgba(34, 211, 238, 0.65);
+    text-shadow: none;
   }
   body.fx-active .textarea {
     border: 1px solid color-mix(in srgb, var(--indigo) 34%, transparent);
@@ -1307,20 +1323,19 @@
       50% { transform: translateY(-8px); }
     }
 
-    /* The corner HUD caret. */
+    /* The top beam, the scanlines and the corner HUD stay for the console look,
+       but they do not crawl or sweep: ambient motion on a page someone reads is
+       flicker, and flicker is what the whole screen looks like doing. */
     .fx-hud .fx-hud-caret { animation: fx-blink 1.1s steps(1, end) infinite; }
     @keyframes fx-blink { 50% { opacity: 0; } }
 
-    /* The top beam sweeps, the scanlines crawl. */
-    .fx-beam { animation: fx-sweep 7s ease-in-out infinite alternate; }
-    @keyframes fx-sweep {
-      from { background-position: 0% 0; }
-      to   { background-position: 100% 0; }
+    .fx-beam {
+      background-size: 260% 100%;
+      opacity: 0.55;
     }
-    .fx-scan { animation: fx-crawl 9s linear infinite; }
-    @keyframes fx-crawl {
-      from { background-position: 0 0; }
-      to   { background-position: 0 48px; }
+    .fx-scan {
+      animation: none;
+      opacity: 0.35;
     }
 
     /* Button hover shimmer. */
@@ -1341,22 +1356,13 @@
     }
     body.fx-active .btn:hover::after { animation: fx-btn-shimmer 0.7s ease; }
 
-    /* The gradient headline slowly shifts hue. */
-    @supports ((background-clip: text) or (-webkit-background-clip: text)) {
-      body.fx-active .hero h1 { animation: fx-hue 10s ease-in-out infinite alternate; }
-    }
-    @keyframes fx-hue {
-      from { background-position: 0% 0; }
-      to   { background-position: 100% 0; }
-    }
+    /* The gradient headline keeps its static gradient; the hue no longer cycles. */
+    .hero h1 { animation: none; }
 
-    /* Identifier pulse on the wordmark, synced to the HUD caret. */
-    @keyframes fx-id {
-      0%, 100% { color: var(--ink); text-shadow: 0 0 0 transparent; }
-      45%, 55% { color: var(--indigo); text-shadow: 0 0 18px rgba(34, 211, 238, 0.7); }
-    }
+    /* Identifier glow on the wordmark, constant rather than pulsing. */
     body.fx-active .wordmark-name {
-      animation: fx-id 4s ease-in-out infinite;
+      color: var(--ink);
+      text-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
     }
 
     /* The busy state draws as a slowly sweeping beam across the skeleton. */

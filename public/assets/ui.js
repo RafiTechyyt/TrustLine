@@ -619,10 +619,20 @@ export class Router {
 
 /** Marks the nav link that matches where we are. */
 export function markNav(root, path) {
-  for (const link of $$("a[href^='#']", root)) {
+  const links = $$("a[href^='#']", root);
+  const matching = links.map((link) => {
     const target = link.getAttribute("href").slice(1).split("?")[0];
     const on = target === path || (target !== "/" && path.startsWith(target));
-    if (on) link.setAttribute("aria-current", "page"); else link.removeAttribute("aria-current");
+    return { link, length: target.length, on };
+  }).filter((c) => c.on);
+  // Only the deepest match gets lit: at /c/cep/feed the "#/c/cep" Report link also
+  // prefix-matches, and lit twice means "selected twice".
+  const best = matching.length
+    ? matching.reduce((a, b) => (b.length > a.length ? b : a))
+    : null;
+  for (const link of links) {
+    if (best && link === best.link) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
   }
 }
 
