@@ -1796,7 +1796,7 @@ async function viewJoin() {
             el("p.t-sm.quiet", { text: "This account routes complaints, creates desks and adds the rest of "
               + "your team. It can never read a report's contact details it was not given." }),
             el("div.gutter-top", {}),
-            text("adminName", "Your name", null, { placeholder: "Dr. A. Nair" }),
+            text("adminName", "Your name", null, { placeholder: "Your name" }),
             text("adminTitle", "Your role", null, { placeholder: "Principal" }),
             text("adminEmail", "Official email", "Use the college domain if you have one — the platform "
               + "office uses it to verify you.", { type: "email", placeholder: "principal@cep.ac.in" }),
