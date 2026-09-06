@@ -501,7 +501,7 @@ export function confirmAction({ title, note, confirmLabel = "Confirm", danger = 
         el("button.btn.btn-quiet.btn-sm", { type: "button", on: { click: () => { closeOverlay(); resolve(null); } } }, "Cancel"),
         el(`button.btn.btn-sm${danger ? ".btn-seal" : ""}.push`, {
           type: "button",
-          on: { click: () => { closeOverlay(); resolve(needs ? (value || "") : true); } },
+          on: { click: () => { resolve(needs ? (value || "") : true); closeOverlay(); } },
         }, confirmLabel),
       ),
     );

@@ -2127,7 +2127,7 @@ function collegeApplicant(college, reload) {
       if (note === null) return;
       try {
         const res = await api.post(`/api/platform/colleges/${college.id}/review`, { decision, note });
-        toast(decision === "approve" ? `Live. ${res.activated} admin activated.` : `${label}d.`, "good");
+        toast(decision === "approve" ? `Live. ${res.activated} admin activated.` : "Rejected.", "good");
         await reload(); refreshCounts();
       } catch (err) { failed(err); }
     } },
@@ -2158,7 +2158,7 @@ function adminApplicant(account, reload) {
         needs: { label: "Note", placeholder: decision === "approve" ? "Confirmed with the existing admin" : "Not authorised by the college" },
       });
       if (note === null) return;
-      try { await api.post(`/api/platform/accounts/${account.id}/review`, { decision, note }); toast(`${label}d.`, "good"); await reload(); refreshCounts(); }
+      try { await api.post(`/api/platform/accounts/${account.id}/review`, { decision, note }); toast(decision === "approve" ? "Approved." : "Rejected.", "good"); await reload(); refreshCounts(); }
       catch (err) { failed(err); }
     } },
   }, label);
