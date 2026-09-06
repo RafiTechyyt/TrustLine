@@ -14,7 +14,3 @@ services:
         value: owner@trustline.app
       - key: TRUSTLINE_OWNER_PASSWORD
         value: trustline-owner
-      # Demo staging: rebuilds data/ from the Kerala college fixtures on every
-      # boot. Remove this key when the instance should keep what people filed.
-      - key: TRUSTLINE_SEED_ON_BOOT
-        value: "1"
