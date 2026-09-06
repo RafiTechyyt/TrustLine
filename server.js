@@ -13,18 +13,40 @@ import { boot } from "./src/services/index.js";
 import { createApp } from "./src/http/app.js";
 import { config } from "./src/config.js";
 
-// Demo bootstrap: with TRUSTLINE_SEED_ON_BOOT=1 and an empty data directory the
-// Kerala demo is rebuilt before the app starts. The store-only-seeds-when-empty
-// guard is what keeps a deployed demo from wiping someone's additions on every
-// redeploy — a redeploy resets an ephemeral disk but not the work that was filed
-// against the last build if the directory survives.
+// Demo bootstrap: with TRUSTLINE_SEED_ON_BOOT=1 the Kerala demo is rebuilt when the
+// data directory holds either nothing or only the seed's own incomplete earlier
+// demo. The guard has two rules and both are what protects a live deployment:
+//   - any college the seed does not own -> never touch it, the demo was already
+//     extended or replaced by real use;
+//   - otherwise seed only until the full roster (marker slug "gect") is present,
+//     so a deploying instance that survived with just the first two-college demo
+//     grows into the full KTU roster instead of staying half-built.
+const SEED_ON_BOOT = {
+  colleges: "colleges.json",
+  // The slugs the seed owns: the fourteen populated colleges and the three it
+  // registers as pending applicants. Anything else in the store is someone's work.
+  owned: new Set([
+    "cep", "cet", "gcek", "gecb", "gect", "cek", "rit", "mec", "tkm", "mace",
+    "sahrdaya", "vidya", "fisat", "asiet",
+    "sree-narayana-institute-of-technology", "government-engineering-college-wayanad",
+    "nehru-college-of-engineering-and-research-centre",
+  ]),
+  marker: "gect",
+};
 if (process.env.TRUSTLINE_SEED_ON_BOOT === "1") {
-  const { existsSync } = await import("node:fs");
+  const { existsSync, readFileSync } = await import("node:fs");
   const { join } = await import("node:path");
-  if (existsSync(join(config.paths.data, "colleges.json"))) {
-    console.log("[seed-on-boot] data directory already has colleges — skipping the seed");
+  const collegesFile = join(config.paths.data, SEED_ON_BOOT.colleges);
+  let shouldSeed = !existsSync(collegesFile);
+  if (!shouldSeed) {
+    const present = JSON.parse(readFileSync(collegesFile, "utf8")).map((c) => c.slug);
+    const hasUnknown = present.some((slug) => !SEED_ON_BOOT.owned.has(slug));
+    shouldSeed = !hasUnknown && !present.includes(SEED_ON_BOOT.marker);
+  }
+  if (!shouldSeed) {
+    console.log("[seed-on-boot] data directory already holds the demo roster — skipping the seed");
   } else {
-    console.log("[seed-on-boot] empty data directory — rebuilding the KTU demo data…");
+    console.log("[seed-on-boot] demo roster incomplete — rebuilding the KTU demo data…");
     await new Promise((resolve, reject) => {
       const child = spawn(process.execPath, ["scripts/seed.js"], { stdio: "inherit" });
       child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`seed on boot failed (exit ${code})`))));
