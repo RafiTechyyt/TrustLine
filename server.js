@@ -13,15 +13,23 @@ import { boot } from "./src/services/index.js";
 import { createApp } from "./src/http/app.js";
 import { config } from "./src/config.js";
 
-// Demo bootstrap: with TRUSTLINE_SEED_ON_BOOT=1 the data directory is rebuilt
-// from the Kerala demo fixtures before the app starts. This is for staging and
-// shareable demos — leave it off for a deployment that is expected to keep data.
+// Demo bootstrap: with TRUSTLINE_SEED_ON_BOOT=1 and an empty data directory the
+// Kerala demo is rebuilt before the app starts. The store-only-seeds-when-empty
+// guard is what keeps a deployed demo from wiping someone's additions on every
+// redeploy — a redeploy resets an ephemeral disk but not the work that was filed
+// against the last build if the directory survives.
 if (process.env.TRUSTLINE_SEED_ON_BOOT === "1") {
-  console.log("[seed-on-boot] rebuilding the demo data directory…");
-  await new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, ["scripts/seed.js"], { stdio: "inherit" });
-    child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`seed on boot failed (exit ${code})`))));
-  });
+  const { existsSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  if (existsSync(join(config.paths.data, "colleges.json"))) {
+    console.log("[seed-on-boot] data directory already has colleges — skipping the seed");
+  } else {
+    console.log("[seed-on-boot] empty data directory — rebuilding the KTU demo data…");
+    await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, ["scripts/seed.js"], { stdio: "inherit" });
+      child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`seed on boot failed (exit ${code})`))));
+    });
+  }
 }
 
 const { container, owner } = await boot();

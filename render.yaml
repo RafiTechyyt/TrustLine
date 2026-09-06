@@ -14,3 +14,5 @@ services:
         value: owner@trustline.app
       - key: TRUSTLINE_OWNER_PASSWORD
         value: trustline-owner
+      - key: TRUSTLINE_SEED_ON_BOOT
+        value: "1"

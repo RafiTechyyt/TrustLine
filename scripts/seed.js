@@ -881,6 +881,484 @@ const GECB_NEWS = [
     body: "The line that feeds the ladies hostel and the research block is being replaced in sections over the next three weeks. Supply to those two buildings will be off between ten in the morning and two in the afternoon on the days the work is on the relevant section. The hostel office will have the day's schedule by the previous evening." },
 ];
 
+// ---- the rest of the KTU roster ---------------------------------------------------
+//
+// CEP and GECB above are hand-written because they are the two people meet first.
+// Everything after them is built by one generator with one shape, so the demo can
+// show a whole university instead of two colleges. Each campus gets the standard
+// eight-desk structure, the twelve KTU categories, four working officers plus one
+// who is parked (so every college shows an approvals row), about twenty reports at
+// the same mix of lifecycles, and four updates. The texts are drawn from a fixed
+// template bank so the transparency medians and the cited updates line up, exactly
+// like the hand-written colleges do.
+
+const KTU_DOMAIN = "ktu.ac.in";
+
+const KTU_COLLEGES = [
+  { slug: "cet", note: "State apex college, verified against the CET office listing.",
+    name: "College of Engineering Trivandrum", shortName: "CET", city: "Thiruvananthapuram",
+    emailDomain: "cet.ac.in", mess: "main mess", line: "the Kulathoor line", labs: "the Strength of Materials lab",
+    motto: "An open register for a campus that outgrew word of mouth.",
+    allowVisitorReports: true, adminName: "Dr. Shantha Mohan", adminTitle: "Principal",
+    adminEmail: "shantha.mohan@cet.ac.in", adminPass: "trivandrum-admin-2026",
+    staff: [["Girish Pillai", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Lekshmi S.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Mahesh Kumar", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Divya Menon", "Systems Administrator", ["IT", "LIB"]],
+      ["Anoop Varma", "Librarian", ["LIB"]]] },
+  { slug: "gcek", note: "Government college, verified through the DTE list.",
+    name: "Government College of Engineering Kannur", shortName: "GCEK", city: "Kannur",
+    emailDomain: "gcek.ac.in", mess: "the campus mess", line: "the Payyanur line", labs: "the electronics lab",
+    motto: "Filed in thirty seconds, answered inside the window it promises.",
+    allowVisitorReports: true, adminName: "Dr. Rajan Kottayi", adminTitle: "Principal",
+    adminEmail: "rajan.kottayi@gcek.ac.in", adminPass: "kannur-admin-2026",
+    staff: [["Sajith Mathew", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Beena Thomas", "Hostel Superintendent", ["HOSTEL"]],
+      ["Ratheesh Kumar", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Naveen Suresh", "Systems Administrator", ["IT", "LIB"]],
+      ["Aiswarya L.", "Librarian", ["LIB"]]] },
+  { slug: "gect", note: "Government college, verified through the DTE list.",
+    name: "Government Engineering College Thrissur", shortName: "GECT", city: "Thrissur",
+    emailDomain: "gect.ac.in", mess: "the girls hostel mess", line: "the Guruvayur line", labs: "the mechanical workshop",
+    motto: "A public clock on every desk, including this one.",
+    allowVisitorReports: true, adminName: "Dr. Bindhu Rajan", adminTitle: "Principal",
+    adminEmail: "bindhu.rajan@gect.ac.in", adminPass: "thrissur-admin-2026",
+    staff: [["Deepak V.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Suma K.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Arun Prakash", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Reshma K. K.", "Systems Administrator", ["IT", "LIB"]],
+      ["Jithin John", "Librarian", ["LIB"]]] },
+  { slug: "cek", note: "Government college, verified through the DTE list.",
+    name: "College of Engineering Kidangoor", shortName: "CEK", city: "Kottayam",
+    emailDomain: "cek.ac.in", mess: "the HQ mess", line: "the Kanjirappally line", labs: "the civil materials lab",
+    motto: "Your words, filed as you wrote them.",
+    allowVisitorReports: true, adminName: "Dr. Manoj K. V.", adminTitle: "Principal",
+    adminEmail: "manoj.kv@cek.ac.in", adminPass: "kidangoor-admin-2026",
+    staff: [["Sreejith Nair", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Vinitha R.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Binu Mathew", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Ajay Menon", "Systems Administrator", ["IT", "LIB"]],
+      ["Parvathy S.", "Librarian", ["LIB"]]] },
+  { slug: "rit", note: "Verified against the RIT Kottayam public listing.",
+    name: "Rajiv Gandhi Institute of Technology", shortName: "RIT", city: "Kottayam",
+    emailDomain: "rit.ac.in", mess: "the hostel mess", line: "the Pampady line", labs: "the microprocessors lab",
+    motto: "Say it once. We will tell you where it went.",
+    allowVisitorReports: false, adminName: "Dr. Santhosh Kumar", adminTitle: "Principal",
+    adminEmail: "santhosh.kumar@rit.ac.in", adminPass: "kottayam-rit-admin-2026",
+    staff: [["Aneesh P.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Sherin Joseph", "Hostel Superintendent", ["HOSTEL"]],
+      ["Manu Thomas", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Lakshmi Narayanan", "Systems Administrator", ["IT", "LIB"]],
+      ["Femi Paul", "Librarian", ["LIB"]]] },
+  { slug: "mec", note: "Verified against the MEC Thrikkakara public listing.",
+    name: "Model Engineering College", shortName: "MEC", city: "Ernakulam",
+    emailDomain: "mec.ac.in", mess: "the MEC mess", line: "the Aluva line", labs: "the VLSI lab",
+    motto: "Anonymous without being anonymous — it gets a desk either way.",
+    allowVisitorReports: true, adminName: "Dr. Saji K. Mathew", adminTitle: "Principal",
+    adminEmail: "saji.mathew@mec.ac.in", adminPass: "thrikkakara-admin-2026",
+    staff: [["Rajesh V.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Kavitha Menon", "Hostel Superintendent", ["HOSTEL"]],
+      ["Silpa Das", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Harikrishnan T.", "Systems Administrator", ["IT", "LIB"]],
+      ["Anju George", "Librarian", ["LIB"]]] },
+  { slug: "tkm", note: "Private aided college, verified against the TKMCE listing.",
+    name: "TKM College of Engineering", shortName: "TKM", city: "Kollam",
+    emailDomain: "tkmce.ac.in", mess: "the TKM mess", line: "the Kottiyam line", labs: "the fluid mechanics lab",
+    motto: "The desk you cannot see is the one that answers fastest.",
+    allowVisitorReports: true, adminName: "Dr. Bindu G. R.", adminTitle: "Principal",
+    adminEmail: "bindu.gr@tkmce.ac.in", adminPass: "kollam-tkm-admin-2026",
+    staff: [["Vineeth Kumar", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Sreelekshmi R.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Baiju George", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Sanal K.", "Systems Administrator", ["IT", "LIB"]],
+      ["Jyothi S.", "Librarian", ["LIB"]]] },
+  { slug: "mace", note: "Private aided college, verified against the MACE listing.",
+    name: "Mar Athanasius College of Engineering", shortName: "MACE", city: "Kothamangalam",
+    emailDomain: "mace.ac.in", mess: "the MACE mess", line: "the Munnar line", labs: "the structural lab",
+    motto: "Forty desks, one door.",
+    allowVisitorReports: true, adminName: "Dr. Tom Jacob", adminTitle: "Principal",
+    adminEmail: "tom.jacob@mace.ac.in", adminPass: "kothamangalam-admin-2026",
+    staff: [["Joju Varghese", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Annamma J.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Roopesh Cherian", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Siby Moncy", "Systems Administrator", ["IT", "LIB"]],
+      ["Neena Philip", "Librarian", ["LIB"]]] },
+  { slug: "sahrdaya", note: "Private un-aided college, verified against the college listing.",
+    name: "Sahrdaya College of Engineering", shortName: "Sahrdaya", city: "Kodakara",
+    emailDomain: "sahrdaya.ac.in", mess: "the Sahrdaya mess", line: "the Ollur line", labs: "the analog lab",
+    motto: "A quiet place to say a loud thing.",
+    allowVisitorReports: true, adminName: "Dr. Georgekutty Joseph", adminTitle: "Principal",
+    adminEmail: "georgekutty.joseph@sahrdaya.ac.in", adminPass: "kodakara-admin-2026",
+    staff: [["Jimmy Jose", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Reetha Cherian", "Hostel Superintendent", ["HOSTEL"]],
+      ["Shibu K. T.", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Arun Gopi", "Systems Administrator", ["IT", "LIB"]],
+      ["Bindu S.", "Librarian", ["LIB"]]] },
+  { slug: "vidya", note: "Private un-aided college, verified against the college listing.",
+    name: "Vidya Academy of Science and Technology", shortName: "Vidya", city: "Thrissur",
+    emailDomain: "vidyaacademy.ac.in", mess: "the Vidya mess", line: "the Wadakkanchery line", labs: "the DSP lab",
+    motto: "The answer is printed too — response times are public here.",
+    allowVisitorReports: true, adminName: "Dr. Sudheesh K. V.", adminTitle: "Principal",
+    adminEmail: "sudheesh.kv@vidyaacademy.ac.in", adminPass: "kurumassery-admin-2026",
+    staff: [["Saju P. K.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Divya K. P.", "Hostel Superintendent", ["HOSTEL"]],
+      ["Vipin Kumar", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Aswin R.", "Systems Administrator", ["IT", "LIB"]],
+      ["Kavya P.", "Librarian", ["LIB"]]] },
+  { slug: "fisat", note: "Private un-aided college, verified against the FISAT listing.",
+    name: "Federal Institute of Science and Technology", shortName: "FISAT", city: "Angamaly",
+    emailDomain: "fisat.ac.in", mess: "the FISAT mess", line: "the Kalady line", labs: "the networking lab",
+    motto: "Complaints that leave a paper trail, not a grudge.",
+    allowVisitorReports: true, adminName: "Dr. Abraham K. Varghese", adminTitle: "Principal",
+    adminEmail: "abraham.kv@fisat.ac.in", adminPass: "angamaly-admin-2026",
+    staff: [["Prakash K.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Anitha Sreedhar", "Hostel Superintendent", ["HOSTEL"]],
+      ["Biju Kuriakose", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Manish P. M.", "Systems Administrator", ["IT", "LIB"]],
+      ["Sruthi M.", "Librarian", ["LIB"]]] },
+  { slug: "asiet", note: "Private un-aided college, verified against the college listing.",
+    name: "Adi Shankara Institute of Engineering and Technology", shortName: "ASIET", city: "Kalady",
+    emailDomain: "adishankara.ac.in", mess: "the ASIET mess", line: "the Aluva line", labs: "the robotics lab",
+    motto: "Filed once, routed right, answered on the record.",
+    allowVisitorReports: true, adminName: "Dr. Jayan K. V.", adminTitle: "Principal",
+    adminEmail: "jayan.kv@adishankara.ac.in", adminPass: "kalady-admin-2026",
+    staff: [["Sreekanth S.", "Assistant Registrar", ["ACAD", "FEES"]],
+      ["Lalitha Nair", "Hostel Superintendent", ["HOSTEL"]],
+      ["Paul Augustine", "Assistant Engineer", ["INFRA", "TRANS"]],
+      ["Aravind K.", "Systems Administrator", ["IT", "LIB"]],
+      ["Megha Jose", "Librarian", ["LIB"]]] },
+];
+
+/** Registered and left for the platform office, so Approve and Reject have rows. */
+const KTU_PENDING = [
+  { registration: {
+    name: "Government Engineering College Wayanad", shortName: "GECW", city: "Mananthavady",
+    state: "Kerala", university: "APJ Abdul Kalam Technological University",
+    emailDomain: "gecwayanad.ac.in", contactEmail: "office@gecwayanad.ac.in",
+    adminName: "Dr. Reena George", adminEmail: "reena.george@gecwayanad.ac.in",
+    adminTitle: "Academic Coordinator", password: "mananthavady-admin-2026" } },
+  { registration: {
+    name: "Nehru College of Engineering and Research Centre", shortName: "NCERC", city: "Pambady",
+    state: "Kerala", university: "APJ Abdul Kalam Technological University",
+    emailDomain: "ncerc.ac.in", contactEmail: "office@ncerc.ac.in",
+    adminName: "Dr. Soja Sreedhar", adminEmail: "soja.sreedhar@ncerc.ac.in",
+    adminTitle: "Dean, Students", password: "pambady-admin-2026" } },
+];
+
+const KTU_DESKS = [
+  { code: "ACAD", name: "Academics & Examinations", slaHours: 72,
+    description: "Results, revaluation and the exam cell." },
+  { code: "HOSTEL", name: "Hostel & Mess", slaHours: 24,
+    description: "The hostels, the mess and the warden roster." },
+  { code: "INFRA", name: "Campus Infrastructure", slaHours: 48,
+    description: "Buildings, water, lighting and the grounds." },
+  { code: "IT", name: "IT & Network", slaHours: 36,
+    description: "Campus WiFi, lab machines and the portal." },
+  { code: "LIB", name: "Library", slaHours: 96,
+    description: "Lending, the reading room and journals." },
+  { code: "TRANS", name: "Transport", slaHours: 48,
+    description: "The college buses, routes and timings." },
+  { code: "ICC", name: "Internal Complaints Cell", slaHours: 8,
+    description: "Ragging and harassment. Confidential." },
+  { code: "FEES", name: "Scholarships & Fees", slaHours: 120,
+    description: "e-Grantz, refunds and hostel dues." },
+];
+
+/** The twelve KTU categories, sharing the shape CEP and GECB use. */
+const KTU_CATS = CEP.categories.map((cat) => ({ ...cat }));
+
+/** One college spec produced from the roster line above. */
+function makeKtuSpec(cfg) {
+  const headFor = new Map();
+  for (const [name, , codes] of cfg.staff) for (const code of codes) headFor.set(code, name);
+  const desks = KTU_DESKS.map((desk) => ({
+    ...desk,
+    headName: headFor.get(desk.code) ?? cfg.adminName,
+    description: desk.description,
+  }));
+  const officers = cfg.staff.map(([name, title, codes], i) => ({
+    name, email: `${name.toLowerCase().replace(/\s+/g, ".")}@${cfg.emailDomain}`, title,
+    password: `${cfg.slug}-officer-2026`, desks: codes,
+    pending: i === cfg.staff.length - 1, // the last staff line is parked for an approvals row
+  }));
+  return {
+    slug: cfg.slug,
+    note: cfg.note,
+    motto: cfg.motto,
+    settings: { defaultSlaHours: 48, autoCloseAfterDays: 10, allowVisitorReports: cfg.allowVisitorReports },
+    registration: {
+      name: cfg.name, shortName: cfg.shortName, city: cfg.city, state: "Kerala",
+      university: "APJ Abdul Kalam Technological University",
+      emailDomain: cfg.emailDomain, contactEmail: `office@${cfg.emailDomain}`,
+      adminName: cfg.adminName, adminEmail: cfg.adminEmail, adminTitle: cfg.adminTitle,
+      password: cfg.adminPass,
+    },
+    desks,
+    categories: KTU_CATS,
+    officers,
+  };
+}
+
+/** The standard lifecycle mix every generated college gets. */
+const KTU_PLAN = [
+  { cat: "WATER", status: "closed", days: 36, hrs: 8, back: 24, rate: [4, "The pump was replaced, not just looked at."], v: 0 },
+  { cat: "WIFI", status: "closed", days: 46, hrs: 5, back: 16, v: 1 },
+  { cat: "MESS", status: "closed", days: 61, hrs: 3, back: 10, v: 0 },
+  { cat: "BUS", status: "closed", days: 54, hrs: 22, back: 13, v: 0 },
+  { cat: "ROOMS", status: "resolved", days: 40, hrs: 14, back: 6, rate: [5, "The warden answered before breakfast the next day."], v: 0 },
+  { cat: "LABS", status: "closed", days: 70, hrs: 40, back: 9, v: 0 },
+  { cat: "REVAL", status: "in_progress", days: 6, due: 14, back: 5, ref: "reval-ref", v: 0, talk: ["d"] },
+  { cat: "REVAL", status: "submitted", days: 30, into: "reval-ref", back: 1, v: 1 },
+  { cat: "SCHOL", status: "closed", days: 74, hrs: 120, back: 6, v: 0,
+    ev: ["e-Grantz acknowledgement slip", "Bank passbook first page"] },
+  { cat: "ACCESS", status: "resolved", days: 20, hrs: 66, back: 3, v: 0 },
+  { cat: "MESS", status: "in_progress", days: 1, due: 8, back: 2, v: 1 },
+  { cat: "LABS", status: "in_progress", days: 2, due: 22, back: 3, v: 1 },
+  { cat: "WIFI", status: "triaged", days: 1, due: 30, back: 1, v: 2 },
+  { cat: "WATER", status: "in_progress", days: 0, due: 3, back: 4, v: 1 },
+  { cat: "LIGHT", status: "in_progress", days: 2, due: -5, back: 11, v: 0 },
+  { cat: "REVAL", status: "escalated", days: 6, due: 20, back: 2, v: 2,
+    escReason: "The application sits with the university counter and the desk has no movement to report." },
+  { cat: "ROOMS", status: "awaiting_reporter", days: 4, idle: 2, due: 24, v: 1, talk: ["q"] },
+  { cat: "BUS", status: "declined", days: 12, v: 1,
+    declineReason: "This is the town bus depot's run, not the college's — the reason is in the thread." },
+  { cat: "MESS", status: "withdrawn", days: 9, pass: "withdrawn-plan", who: "parent", v: 2 },
+  { cat: "GRIEV", status: "resolved", days: 22, hrs: 30, pub: false, pass: "icc-plan-pass", v: 0, who: "scholar", talk: ["n", "d"] },
+];
+
+const KTU_TITLES = {
+  WATER: [
+    (s, w) => `No water in the ${w} hostel washrooms after 7am`,
+    (s, w) => `The overhead tank motor for the ${w} hostel keeps tripping`,
+  ],
+  WIFI: [
+    (s, w) => `${s.labs} has no wifi coverage at all`,
+    (s, w) => `Campus wifi drops every few minutes in the reading room`,
+    (s, w) => `The student portal times out every evening after 6pm`,
+  ],
+  MESS: [
+    (s, w) => `Breakfast in ${s.mess} was served half cooked`,
+    (s, w) => `The menu this week for ${s.mess} is mostly missed items`,
+    (s, w) => `No vegetarian option at lunch in ${s.mess} for three days`,
+  ],
+  BUS: [
+    (s, w) => `The ${s.line} bus leaves before the timetable it prints`,
+    (s, w) => `The bus on ${s.line} is overcrowded after the 4pm lab`,
+  ],
+  LABS: [
+    (s, w) => `Four machines in ${s.labs} will not switch on`,
+    (s, w) => `${s.labs} is short of working oscilloscopes`,
+  ],
+  LIGHT: [
+    (s, w) => `The path from the back gate to the ${w} hostel is completely dark`,
+  ],
+  REVAL: [
+    (s, w) => `S3 revaluation result has not moved in a month`,
+    (s, w) => `Supplementary hall ticket prints the wrong subject code`,
+    (s, w) => `No reply from the exam cell about a revaluation file`,
+  ],
+  ROOMS: [
+    (s, w) => `The room fan on the top floor barely turns — ${w} hostel`,
+    (s, w) => `No mattress on my bunk ${w} hostel, promised last month`,
+  ],
+  SCHOL: [
+    (s, w) => `e-Grantz sanction for last term has not been released`,
+  ],
+  ACCESS: [
+    (s, w) => `The ramp to the CS block has a broken railing`,
+  ],
+  GRIEV: [
+    (s, w) => `Comments at the ${w} hostel stairs have gone past a joke`,
+    (s, w) => `I am being followed on the walk between the gate and the ${w} hostel`,
+  ],
+};
+
+const KTU_BODIES = {
+  WATER: [
+    (s, who) => `From about seven in the morning the taps in the ${who} hostel give nothing on the floors above the first. It comes back around eleven. Roughly forty people are getting ready in that window and there are two working taps on the ground floor for all of them.`,
+    (s, who) => `The overhead tank motor for the ${who} hostel has tripped twice this week and the tank never fills before the morning rush. Each time it takes the caretaker a few hours to notice and reset it.`,
+  ],
+  WIFI: [
+    (s, who) => `Sitting in ${s.labs} there is no wifi at all, while the corridor outside works fine. We carry our files on pen drives because it has been like this for a term.`,
+    (s, who) => `Sitting in the reading room the wifi disconnects every few minutes and takes a while to come back. It is fine in the corridor, which suggests the access point sits behind the metal stack shelves.`,
+    (s, who) => `Every evening after six the student portal takes minutes to load, and right before a deadline it fails entirely. The lab across the wing is on the same network and works, so it looks like one of the two uplinks is saturated.`,
+  ],
+  MESS: [
+    (s, who) => `The idli at breakfast was raw in the middle and three of us put it back. The cook said the steamer was started late because the gas cylinder was changed that morning.`,
+    (s, who) => `Of the fourteen items on this week's printed menu for ${s.mess}, five have never appeared and three were replaced without saying. The menu is how people decide whether to eat on campus at all.`,
+    (s, who) => `For three days this week lunch in ${s.mess} had no vegetarian main at all. There are at least a dozen of us and we ate rice and whatever chutney was left.`,
+  ],
+  BUS: [
+    (s, who) => `The bus on ${s.line} prints one departure time in the notice and leaves five minutes earlier in practice. People who arrive on the printed time watch it pull away.`,
+    (s, who) => `After the 4pm lab the bus on ${s.line} runs standing room only, and twice it has left people at the stop because it was full. A third trip for that window would fix it.`,
+  ],
+  LABS: [
+    (s, who) => `Four machines in ${s.labs} will not switch on and a fifth takes ten minutes to get past the login. The lab seats us in groups of three around the ones that do work.`,
+    (s, who) => `${s.labs} has two working oscilloscopes for a twenty-four bench lab. The box of them marked for repair has been full since last term.`,
+  ],
+  LIGHT: [
+    (s, who) => `There is no working light on the stretch between the back gate and the ${who} hostel turning. One pole halfway has been dark for weeks and people walk that part in groups on purpose.`,
+  ],
+  REVAL: [
+    (s, who) => `The revaluation application from last month shows no movement on the university portal and the exam cell here has not told us anything either way. A file that silent for a month is not being worked.`,
+    (s, who) => `The supplementary hall ticket generated for my subject prints the wrong subject code — a code from a different programme. I checked against the portal and the exam cell has not answered.`,
+    (s, who) => `I wrote to the exam cell twice about a revaluation file and there is no reply on the portal or by email. I am filing this here because it is the only place an answer is on the record.`,
+  ],
+  ROOMS: [
+    (s, who) => `The ceiling fan on the top floor of the ${who} hostel barely turns and spins the wrong way on slow. We have two hours of study left after the mess closes.`,
+    (s, who) => `My bunk has no mattress two months after the allotment, despite being promised one "this week" since the start. The linen room says it is not their list.`,
+  ],
+  SCHOL: [
+    (s, who) => `The e-Grantz sanction for last term has not been released and the office says the payment file is "with the treasury". Without it the hostel installment is due on my head.`,
+  ],
+  ACCESS: [
+    (s, who) => `The ramp to the CS block threw me off when a railing bolt came free and the rail swung away. Someone who needs the rail to climb would have come down.`,
+  ],
+  GRIEV: [
+    (s, who) => `Comments have stopped being a joke at the ${who} hostel stairs. It happens in a group so nobody has said anything, but it is every evening now and I would rather the cell hold them to it than it escalate.`,
+    (s, who) => `For a week I am being followed on the walk between the gate and the ${who} hostel, always the same distance behind. I cannot identify the person in a line-up, so I am reporting the pattern while it is a pattern.`,
+  ],
+};
+
+const titleFor = (cat, variant, cfg) => {
+  const fn = KTU_TITLES[cat][variant % KTU_TITLES[cat].length];
+  const who = cat === "GRIEV" || cat === "WATER" || cat === "ROOMS" || cat === "LIGHT"
+    ? (cat === "LIGHT" ? "ladies" : "second-year") : "main";
+  return fn(cfg, who);
+};
+
+// Which desk messages a plan position gets. Kinds: n = internal note, d = reply to
+// the reporter, q = a reply that parks the report waiting on the reporter.
+const KTU_TALK_KINDS = {
+  "WATER|0": ["n", "d"], "WATER|1": ["d"],
+  "WIFI|1": ["d"], "WIFI|2": [],
+  "MESS|0": ["n", "d"], "MESS|1": ["d"], "MESS|2": [],
+  "BUS|0": ["n", "d"], "BUS|1": ["d"],
+  "ROOMS|0": ["d"], "ROOMS|1": ["q"],
+  "LABS|0": ["n", "d"], "LABS|1": ["d"],
+  "REVAL|0": ["d"], "REVAL|1": [], "REVAL|2": [],
+  "SCHOL|0": ["n", "d"],
+  "ACCESS|0": ["d"],
+  "LIGHT|0": ["d"],
+  "GRIEV|0": ["n", "d"],
+};
+
+// The words behind those kinds, picked by category then by the fixture's variant.
+const KTU_MESSAGES = {
+  WATER: {
+    n: [(s) => `The night caretaker logged the pump tripping at 5.20am; the pump attendant had it back by six.`],
+    d: [
+      (s) => `The pump was serviced this morning and the tank filled before seven. If the taps run dry again tomorrow, the warden's office number is pinned in this thread.`,
+      (s) => `The motor was tripping on the thermal overload every time the starter reset, so the starter was past its job. The spare motor is in and it filled normally this morning.`,
+    ],
+  },
+  WIFI: {
+    d: [
+      () => `The access point behind the stack shelves was dead and has been moved in front of the partition. Coverage is now across the room.`,
+      () => `The access point firmware was restarting on memory pressure. It has been replaced and the channel plan spread out. Report back through this thread if the readout drops again.`,
+      () => `The evening saturation was one uplink: the loads have been split across both lines and the portal comes up in under a second now.`,
+    ],
+  },
+  MESS: {
+    n: [(s) => `The kitchen ledger for that meal was pulled and the supplier's slip is attached.`],
+    d: [
+      () => `The steamer is started an hour earlier from tomorrow and the cook roster marks it. That meal should not be served raw again.`,
+      () => `The menu committee meets Friday afternoon. The missed items go on the agenda with the dates they were promised, and the committee keeps the printed menu honest.`,
+      () => `A vegetarian main now has to be on every lunch and dinner service. The mess committee is adding it to the signed contract.`,
+    ],
+  },
+  BUS: {
+    n: [(s) => `The departure time in the notice was checked against the gate camera for that week.`],
+    d: [
+      () => `The driver was a contract fill-in that month. The timed departure is being set from the camera log, not the printed notice, and the notice follows it.`,
+      () => `The 4pm run is now shared with the 4.30 feeder so nobody waits past the timetable. Try the next departure and say so here if it staggers the same way.`,
+    ],
+  },
+  ROOMS: {
+    d: [() => `The fan on the top floor was found bridged on a bad winding. It is replaced with a working unit and the whole top floor was checked before it went back on.`],
+    q: [() => `The linen register shows your bunk number with a mattress issued on the fifteenth. Was there ever one on the bed, or was the room handed over empty? A word in and we will pull the issue slip.`],
+  },
+  LABS: {
+    n: [(s) => `The machines were bench-tested this morning; two are PSU faults and two are RAM.`],
+    d: [
+      () => `Two machines had failed power supplies and two had bad RAM sticks. All four are back on the network and the fifth boots in under a minute now.`,
+      () => `The oscilloscope stock is short because the calibration contract has a three-week backlog. Two working units are being moved here from the research wing and the repair queue is in this thread.`,
+    ],
+  },
+  REVAL: {
+    d: [
+      () => `The exam cell tracked this file to the university counter this week, where it is with the subject officer. The cell is writing to you on Fridays with whatever the counter has said by then.`,
+      () => `The hall ticket code is a portal cache from a syllabus before the code shuffle. The corrected print is ready at the exam cell desk and the portal copy refreshes overnight.`,
+    ],
+  },
+  SCHOL: {
+    n: [(s) => `The sanction file for that instalment was checked against the treasury mention twice.`],
+    d: [() => `The instalment file was rejected by the treasury on an old bank code, not a sanction issue. It has been corrected and resubmitted; credit follows in two to three weeks. The mention is scanned into this thread.`],
+  },
+  ACCESS: {
+    d: [() => `The railing bolt came free where the handrail meets the ramp landing. It is re-welded and the other landings were given the same check this week.`],
+  },
+  LIGHT: {
+    d: [() => `The pole was dead on the photocell, not the lamp. The cell is replaced and the stretch from the gate to the turning is lit from tonight.`],
+  },
+  GRIEV: {
+    n: [(s) => `The cell walked the route at the time given and spoke to the till and mess staff who were around. The autumn camp letter is on file.`],
+    d: [() => `The cell has looked into this and taken it up directly, which is why this thread says little. The harassment has been told plainly to stop, and the cell remains open to you through the confidential desk.`],
+  },
+};
+
+/** The thread a fixture replays, as tuples of [kind, words the desk/reporter said]. */
+const talkFor = (plan, cfg) => {
+  const kinds = KTU_TALK_KINDS[`${plan.cat}|${plan.v}`]
+    ?? (plan.into || plan.status === "withdrawn" ? [] : ["d"]);
+  return kinds.map((kind) => {
+    const bank = KTU_MESSAGES[plan.cat]?.[kind] ?? [];
+    const line = bank[plan.v % Math.max(bank.length, 1)];
+    return [kind, (typeof line === "function" ? line : () => `The ${plan.cat.toLowerCase()} desk is on it and will reply through this thread.`)(cfg)];
+  });
+};
+
+/** The ~20 fixture records a generated college files. */
+function makeKtuReports(cfg) {
+  return KTU_PLAN.map((plan, i) => {
+    const fixture = { ...plan, talk: undefined, v: undefined, ref: undefined, into: undefined, escReason: undefined, declineReason: undefined, pass: undefined, pub: plan.pub, who: plan.who };
+    if (plan.ref) fixture.ref = plan.ref;
+    if (plan.into) fixture.into = plan.into;
+    if (plan.escReason) fixture.escReason = plan.escReason;
+    if (plan.declineReason) fixture.declineReason = plan.declineReason;
+    if (plan.pass) fixture.pass = plan.pass;
+    fixture.title = titleFor(plan.cat, plan.v, cfg);
+    fixture.body = KTU_BODIES[plan.cat][plan.v % KTU_BODIES[plan.cat].length](cfg, plan.who ?? "main");
+    fixture.loc = plan.cat === "MESS" ? cfg.mess
+      : plan.cat === "BUS" ? `${cfg.line} bus stop`
+        : plan.cat === "GRIEV" ? `${cfg.shortName} campus` : `${cfg.shortName} campus`;
+    fixture.tags = [plan.cat === "GRIEV" ? "confidential" : plan.cat.toLowerCase()];
+    fixture.occ = (plan.days ?? 0) + 1;
+    fixture.talk = talkFor(plan, cfg);
+    if (plan.status === "in_progress" || plan.status === "triaged") fixture.pause = 0;
+    return fixture;
+  });
+}
+
+/** The four updates a generated college posts, citing the reports it worked. */
+function makeKtuNews(cfg) {
+  const cite = (cat, variant) => titleFor(cat, variant, cfg);
+  return [
+    { days: 3, pinned: true, cite: [cite("WATER", 0), cite("WATER", 1)],
+      title: `Water supply: ${cfg.mess} pump house back on schedule`,
+      body: `The two pumps that feed the ${cfg.name} hostels have both been overhauled after a fortnight of one tripping on overload, and the tanks now fill before seven in the morning. The reports linked below were the two that got it moving. If your floor is still dry after eight, file it — the hostel desk would rather have a duplicate than a silence.` },
+    { days: 8, expires: 30, cite: [cite("WIFI", 0)],
+      title: "Wifi in the labs: what changed this week",
+      body: `The coverage complaints across the campus have been walked this week and the quiet spots are being fixed in the order the reports arrived. The desks publish their response windows on the transparency page, and the clock starts the moment you file.` },
+    { days: 15, expires: 14, cite: [cite("MESS", 0)],
+      title: `${cfg.mess} committee meets every Friday at four`,
+      body: `Two student seats on the mess committee are open. The committee sets the menu, checks the kitchen and sees the contractor's bill, so it is the place where menu and quality decisions actually get made. Nomination forms are with the hostel office until Thursday.` },
+    { days: 21, cite: [cite("REVAL", 0), cite("REVAL", 2)],
+      title: `Exam cell: what we are doing about the revaluation delays`,
+      body: `The exam cell is the slowest desk on this platform at the moment and there is no point pretending otherwise. From this month the exam cell writes to every pending revaluation applicant on a Friday whether or not there is news, and any file with no movement in three weeks goes to the principal's office rather than waiting to be asked about.` },
+  ];
+}
+
 // ---- building the campus ----------------------------------------------------------
 
 /**
@@ -1258,10 +1736,22 @@ async function main() {
   const cep = await seedCollege(services, db, owner, CEP, CEP_REPORTS, CEP_NEWS);
   const gecb = await seedCollege(services, db, owner, GECB, GECB_REPORTS, GECB_NEWS);
 
-  // Registered and left alone. This is the row the platform review queue opens on,
-  // and its admin cannot sign in until the platform office says so.
-  const { college: snit } = await services.auth.registerCollege(SNIT.registration);
-  step(`${snit.shortName} registered and left pending — the platform review queue has a row`);
+  const extras = [];
+  for (const cfg of KTU_COLLEGES) {
+    const spec = makeKtuSpec(cfg);
+    const built = await seedCollege(services, db, owner, spec, makeKtuReports(cfg), makeKtuNews(cfg));
+    extras.push({ college: built.college, spec });
+  }
+  step(`KTU roster: ${extras.length} generated colleges approved and populated`);
+
+  // Registered and left alone. These are the rows the platform review queue opens
+  // on, and their admins cannot sign in until the platform office says so.
+  const pendingColleges = [];
+  for (const { registration } of [SNIT, ...KTU_PENDING]) {
+    const { college } = await services.auth.registerCollege(registration);
+    pendingColleges.push({ college, registration });
+  }
+  step(`${pendingColleges.length} colleges registered and left pending — the platform review queue has rows`);
 
   // Each of these comes back as the list of trace codes it touched, not a count.
   const swept = await services.sla.sweep();
@@ -1279,10 +1769,11 @@ async function main() {
   process.stdout.write(`${credentials([
     { college: cep.college, spec: CEP },
     { college: gecb.college, spec: GECB },
-    { college: snit, spec: SNIT },
+    ...extras,
+    ...pendingColleges.map(({ college, registration }) => ({ college, spec: { registration } })),
   ])}\n`);
   process.stdout.write(`${rule("Trace codes to try at /#/trace")}\n`);
-  process.stdout.write(`${[...traceCodes(db, cep), ...traceCodes(db, gecb)].join("\n")}\n`);
+  process.stdout.write(`${[...traceCodes(db, cep), ...traceCodes(db, gecb), ...traceCodes(db, extras[0])].join("\n")}\n`);
   process.stdout.write(`${rule("Next")}\n  npm start   then open http://localhost:${config.port}\n\n`);
 }
 
