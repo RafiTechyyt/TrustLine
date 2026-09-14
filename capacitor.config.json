@@ -1,0 +1,13 @@
+{
+  "appId": "in.trustline.app",
+  "appName": "TrustLine",
+  "webDir": "public",
+  "server": {
+    "url": "https://trustline-h4e1.onrender.com",
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#05080f",
+    "allowMixedContent": false
+  }
+}
