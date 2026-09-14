@@ -12,7 +12,8 @@
     "smoke": "node scripts/smoke.js",
     "api-test": "node scripts/api-test.js",
     "gen-icons": "node scripts/gen-icons.mjs",
-    "apk": "cap sync android && cd android && gradlew.bat assembleDebug"
+    "apk": "cap sync android && cd android && gradlew.bat assembleDebug",
+    "apk:release": "cap sync android && cd android && gradlew.bat assembleRelease"
   },
   "dependencies": {
     "@capacitor/android": "7.6.9",

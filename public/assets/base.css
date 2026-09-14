@@ -241,6 +241,10 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--s4) 0; }
   backdrop-filter: blur(6px);
   position: sticky;
   top: 0;
+  /* On a phone that draws under the system bars (standalone PWA, the Android
+     shell), keep the masthead below the cutout instead of letting the marks
+     ride up into the camera. Env() is 0 everywhere else. */
+  padding-top: env(safe-area-inset-top, 0px);
   z-index: 40;
 }
 .masthead-in { display: flex; align-items: center; gap: var(--s4); min-height: 62px; }
