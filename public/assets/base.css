@@ -261,6 +261,19 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: var(--s4) 0; }
 .nav a:hover { color: var(--ink); }
 .nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--seal); }
 
+/* In-app "Go back": the companion to the Android shell's hardware back, so the
+   phone's gesture and the visible control agree about what back means. */
+.nav .nav-back {
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  padding: var(--s2) var(--s3) var(--s2) 0;
+  margin-right: calc(var(--s3) * -1);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.nav .nav-back:hover { color: var(--ink); }
+
 /* ---- hero ---------------------------------------------------------------- */
 
 /* Asymmetric on purpose: the sentence that explains the promise gets the left

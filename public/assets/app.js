@@ -41,12 +41,28 @@ function busy(title) {
 
 /** The masthead links. They change with the college, so they are drawn per view. */
 function nav(handle = null) {
+  const here = Router.path();
   const links = handle
     ? [["#/c/" + handle, "Report"], ["#/c/" + handle + "/feed", "Feed"],
       ["#/c/" + handle + "/record", "Response times"], ["#/trace", "Track"]]
     : [["#/", "Colleges"], ["#/trace", "Track a report"], ["#/join", "For colleges"]];
-  fill(navHost, ...links.map(([href, text]) => el("a", { href, text })));
-  markNav(navHost, Router.path());
+  const kids = [];
+  // On anything but the front page, offer a way back in-app: the Android shell's
+  // hardware back follows the same history, so both gestures mean the same thing.
+  if (here !== "/") kids.push(el("button.nav-back", {
+    type: "button",
+    ariaLabel: "Go back",
+    on: { click: () => goBack() },
+  }, "‹ Back"));
+  kids.push(...links.map(([href, text]) => el("a", { href, text })));
+  fill(navHost, ...kids);
+  markNav(navHost, here);
+}
+
+/** Back one screen in the hash history; from the front page there is nowhere to go. */
+function goBack() {
+  if (window.history.length > 1 && Router.path() !== "/") history.back();
+  else Router.go("/");
 }
 
 function title(text) { document.title = `${text} — TrustLine`; }
