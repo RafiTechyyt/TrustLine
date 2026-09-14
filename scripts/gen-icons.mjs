@@ -151,3 +151,53 @@ for (const [density, size] of densities) {
   writeFileSync(join(dir, "ic_launcher_foreground.png"), png(size, size, render(size, glyphCover, BAR)));
   process.stdout.write(`mipmap-${density} launcher + round + foreground (${size})\n`);
 }
+
+/** Splash canvas: the dark background everywhere, the glyph centered on it. */
+function renderRect(width, height) {
+  const ss = 3;
+  const out = Buffer.alloc(width * height * 4);
+  const side = Math.round(0.3 * Math.min(width, height));
+  const ox = (width - side) / 2, oy = (height - side) / 2;
+  const bg = [BG[0], BG[1], BG[2], 255];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      out[i] = bg[0]; out[i + 1] = bg[1]; out[i + 2] = bg[2]; out[i + 3] = 255;
+      let acc = [0, 0, 0], hits = 0;
+      for (let sy = 0; sy < ss; sy++) {
+        for (let sx = 0; sx < ss; sx++) {
+          const gx = (x + (sx + 0.5) / ss - ox) / side;
+          const gy = (y + (sy + 0.5) / ss - oy) / side;
+          if (gx < 0 || gx > 1 || gy < 0 || gy > 1) continue;
+          const g = glyph(gx, gy);
+          if (g > 0) {
+            hits++;
+            const col = g === 2 ? SEAL : BAR;
+            acc[0] += col[0]; acc[1] += col[1]; acc[2] += col[2];
+          }
+        }
+      }
+      if (hits > 0) {
+        const n = ss * ss;
+        out[i] = Math.round(acc[0] / n + (bg[0] * (n - hits)) / n);
+        out[i + 1] = Math.round(acc[1] / n + (bg[1] * (n - hits)) / n);
+        out[i + 2] = Math.round(acc[2] / n + (bg[2] * (n - hits)) / n);
+      }
+    }
+  }
+  return out;
+}
+
+const splashDims = [
+  ["drawable-land-mdpi", 480, 320], ["drawable-land-hdpi", 800, 480],
+  ["drawable-land-xhdpi", 1280, 720], ["drawable-land-xxhdpi", 1600, 960],
+  ["drawable-land-xxxhdpi", 1920, 1280], ["drawable-port-mdpi", 320, 480],
+  ["drawable-port-hdpi", 480, 800], ["drawable-port-xhdpi", 720, 1280],
+  ["drawable-port-xxhdpi", 960, 1600], ["drawable-port-xxxhdpi", 1280, 1920],
+];
+for (const [dirName, w, h] of splashDims) {
+  const dir = join(mip, dirName);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "splash.png"), png(w, h, renderRect(w, h)));
+  process.stdout.write(`${dirName}/splash.png ${w}x${h}\n`);
+}
